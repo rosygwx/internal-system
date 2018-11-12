@@ -1,0 +1,4 @@
+﻿contract_id,hwy_id,section_from,section_to,tcat_id,tract,mile,cycle
+1,IH 35W,PHARR STREET,RENFRO DRIVE,7,3,15.51,18
+1,SH 360,FORT WORTH CITY LIMIT,SUBLETT RD,7,4,11.54,12
+1,IH 20,IH 820 SW,DALLAS COUNTY LINE,8,1,25.99,18

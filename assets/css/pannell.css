@@ -1,0 +1,18 @@
+
+
+
+
+.sidenav {
+    width: 100px;
+    padding: 5px 0;
+    text-align: center;
+}
+
+hr {
+	border: 0px;
+	clear:both;
+	display:block;
+	width: 96%;               
+	background-color:#DCDCDC;
+	height: 1px;
+}
