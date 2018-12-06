@@ -262,42 +262,47 @@
 	  <!-- model start -->
 		
 		<div class="modal fade" id="addDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-			<form action="<?php echo Base_URL(); ?>schedule/update/testttttt" method="POST">
+			<form action="<?php echo Base_URL(); ?>schedule/duplicate" method="POST">
 			    <div class="modal-dialog modal-lg">
 			        <div class="modal-content">
 			            <div class="modal-header">
 			                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-			                <h4 class="modal-title">Set Up Schedule</h4>
+			                <h4 class="modal-title">Duplicate Schedule</h4>
 			            </div>
 
 			            <div class="modal-body" style="margin-top: 10px;"> 
-		                    <input class="form-control" type="hidden" id="id" name="schedule_id" placeholder="Shcedule ID..." value="">
-		                    
+		                    <input class="form-control" type="hidden" id="id" name="id" placeholder="Shcedule ID..." value="">
+
+		                    <input type='hidden' name='backurl'  id='backurl' value='<?php echo urlencode(trim($_SERVER['PATH_INFO'].'?'.$_SERVER['QUERY_STRING'], '/'))?>' ></input>
+
+
 		                    <div class="form-group">
 		                        <label class="col-md-3">Contract Name</label>
 		                        <div class="col-md-9">
 		                         	<input class="form-control" type="text" id="contract"  name="contract"  value=""  disabled>
 		                        </div>
 		                    </div>
+		                    
 		                    <div class="form-group">
-								<label class="col-md-3">Location:</label>
-								<div class="col-md-9">
-									<input class="form-control" type="text" id="location" name="location" value="">
-								</div>
-							</div>
-		                    <div class="form-group">
-		                        <label class="col-md-3">Complete Date</label>
+		                        <label class="col-md-3">Schedule Date</label>
 		                        <div class="col-md-9">
-		                         	<input class="form-control datetimepicker4" type="text" id="date"  name="date"  value="" placeholder="Date...">
+		                         	<input class="form-control datetimepicker4" type="text" id="date"  name="date"  value="" placeholder="Date..." autocomplete="off">
 		                        </div>
 		                    </div>
 		                    <div class="form-group">
 		                        <label class="col-md-3">Start Time</label>
 		                        <div class="col-md-9">
-		                         	<input class="form-control datetimepicker_start" type="text" id="btime"  name="btime"  value="" placeholder="Begin Time...">
+		                         	<input class="form-control datetimepicker_start" type="text" id="btime_req"  name="btime_req"  value="" placeholder="Begin Time..." autocomplete="off">
 		                        </div>
 		                    </div>
+		                    <!-- 
 		                    <div class="form-group">
+								<label class="col-md-3">Location:</label>
+								<div class="col-md-9">
+									<input class="form-control" type="text" id="location" name="location" value="" >
+								</div>
+							</div>
+							<div class="form-group">
 								<label class="col-md-3 ">End Time:</label>
 								<div class="col-md-9">
 				                    <input class="form-control datetimepicker_end" type="text" id="etime" name="etime" value="" placeholder="End Time...">
@@ -321,8 +326,8 @@
 										<input type='text' class="form-control" id="disposal_charge" name="disposal_charge" value="">
 									</div>
 				                </div> 
-							</div>
-		                    <input type="hidden" type="text" name="backurl" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
+							</div> -->
+		                    <input type='hidden' name='backurl'  id='backurl' value='<?php echo urlencode(trim($_SERVER['PATH_INFO'].'?'.$_SERVER['QUERY_STRING'], '/'))?>' ></input>
 			            	
 			        	</div>
 
@@ -345,7 +350,7 @@
 		</div>	 -->
 		<div class="form-group">
 			<!-- <label for="title">Company Name:</label> -->
-			<input class="form-control" type='text' name='company' value='<?php echo $search['company'];?>' placeholder="Company name...">
+			<input class="form-control" type='text' name='company' value='<?php echo $search['company'];?>' placeholder="Company Name...">
 		</div> 
 
 		
@@ -419,6 +424,7 @@
 				<tr>
 				  <th class="text-left"><input type="checkbox" onclick="check_all(this,'checkall[]')" >  </th>
 				  <th>ScheduleDate</th>
+				  <th>ScheduleStart</th>
 				  <th>Start</th>
 				  <th>End</th>
 				  <th>Company</th>
@@ -455,6 +461,7 @@
 				<?php }?>
 					<td class="text-left"><input name="checkall[]" type="checkbox" value="<?=$v->schedule_id?>"></td>	
 					<td><?php echo $v->schedule_period;?></td>
+					<td><?php if($v->btime_req)echo date('H:iA', strtotime($v->btime_req));else echo '-';?></td>
 					<td><?php if($v->btime)echo date('H:iA', strtotime($v->btime));else echo '-';?></td>
 					<td><?php if($v->etime)echo date('H:iA', strtotime($v->etime));else echo '-';?></td>							
 					<td><?php echo $v->contract_id_pannell?></td>					
@@ -515,12 +522,13 @@
 						<?php } ?> -->
 						<!-- <a onclick='return confirm("Confirm to delete?")' href="<?php echo BASE_URL();?>company/delete/?company_id=<?=$v->company_id?>">Delete</a>  -->
 
-						<!-- <a class="open-AddDialog " data-toggle="modal"  data-id="<?php echo $v->schedule_id;?>" data-employee="<?php echo $v->employeejs;?>" data-btime="<?php echo date('H:i',strtotime($v->btime));?>" data-etime="<?php echo date('H:i',strtotime($v->etime));?>" data-date="<?php echo $v->date;?>" data-contract="<?php echo $v->contract_id_pannell;?>" data-location="<?php echo $v->location;?>" data-location="<?php echo $v->location;?>" href="#addDialog">Setup</a> -->
 
 						<a href="<?php echo BASE_URL();?>schedule/updateCom/?id=<?=$v->schedule_id?>">Update </a> 
 
 						
 						<a class="complete" scid="<?php echo $v->schedule_id?>" status="<?php echo $v->status?>"  href="javascript:void(0)"> <?php if($v->status == 0)echo 'Complete';else echo 'Incomplete';?></a> 
+
+						<a class="open-AddDialog " data-toggle="modal"  data-id="<?php echo $v->schedule_id;?>" data-employee="<?php echo $v->employeejs;?>" data-btime="<?php echo date('H:i',strtotime($v->btime));?>" data-date="<?php echo $v->date;?>" data-contract="<?php echo $v->contract_id_pannell;?>" data-location="<?php echo $v->location;?>" data-location="<?php echo $v->location;?>" href="#addDialog">Duplicate</a>
 
 						<a class="delete" scid="<?php echo $v->schedule_id?>" href="javascript:void(0)"> Delete</a> 
 

@@ -107,6 +107,7 @@ class Schedule_model extends CI_Model{
 			else
 				continue;
 		}
+		
 		$this->db->insert($this->schedule_table, $newarr); 
 		$insert_id = $this->db->insert_id();
 		return $insert_id;

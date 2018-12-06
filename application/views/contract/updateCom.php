@@ -29,6 +29,12 @@
 	</style>
 	<script type="text/javascript">
 		
+		$(function () {
+			$('.datetimepicker').datetimepicker({
+            	format:'MM/DD/YYYY',
+            	//minDate:moment()
+            });
+        });
 	</script>
 </head>
 
@@ -48,6 +54,13 @@
 					<label class="col-md-2 control-label"><i>*</i>Company Name:</label>
 					<div class="col-md-10">
 						<input type="text" class="form-control" name="company_name" value="<?php echo $contract->company_name?>"  autocomplete="off" readonly>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-md-2 control-label">Sign Date:</label>
+					<div class="col-md-10 ">
+						<input type="text" class="form-control datetimepicker" name="sign_date" value="<?php echo $contract->sign_date?>" autocomplete="off" >
 					</div>
 				</div>
 

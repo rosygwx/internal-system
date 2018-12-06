@@ -146,8 +146,8 @@
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Contract <i class="fas fa-folder-open fa-lg pull-right hidden-xs"></i></a>
           <ul class="dropdown-menu forAnimate" role="menu">
             <li><a href="<?=base_url().'contract/lists'?>"><i class="fas fa-angle-right"></i></i> List (TxDot)</a></li>
-            <li><a href="<?=base_url().'contract/lists?company_type=2'?>"><i class="fas fa-angle-right"></i> List (Commercial)</a></li>
             <li><a href="<?=base_url().'contract/add'?>"><i class="fas fa-angle-right"></i>  Add (TxDot )</a></li>
+            <li><a href="<?=base_url().'contract/lists?company_type=2'?>"><i class="fas fa-angle-right"></i> List (Commercial)</a></li>
             <li><a href="<?=base_url().'contract/addCom'?>"><i class="fas fa-angle-right"></i> Add (Commercial)</a></li>
           </ul>
         </li> 
@@ -175,7 +175,10 @@
          <li class="dropdown <?php if($current == 'report'){ echo 'active'; }?>">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Report <i class="fas fa-chart-pie fa-lg pull-right hidden-xs" ></i></a>
           <ul class="dropdown-menu forAnimate" role="menu">
+            <li><a href="<?=base_url().'contract/monthlyBill'?>"><i class="fas fa-angle-right"></i> Monthly Bill (TxDot)</a></li>
+            <li><a href="<?=base_url().'contract/dailyReport'?>"><i class="fas fa-angle-right"></i> Daily Report (TxDot)</a></li>
             <li><a href="<?=base_url().'schedule/monthlyBillCom'?>"><i class="fas fa-angle-right"></i> Monthly Bill (Commercial)</a></li>
+            <li><a href="<?=base_url().'truck/reportExpense'?>"><i class="fas fa-angle-right"></i> Truck Expenses<br>&nbsp&nbsp(ManagerPlus)</a></li>
           </ul>
         </li> 
 

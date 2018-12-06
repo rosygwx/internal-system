@@ -6,11 +6,16 @@
 	 
 	$(function () {
 		console.log('1');
-        $('.datetimepicker').datetimepicker({
+        $('.date').datetimepicker({
         	format:"MM/DD/YYYY"
         	//viewMode: 'months'
         });
     });
+
+    function exportPdf(){
+    	document.getElementById("ifPrint").value=1;
+    	return true;
+    }
 </script>
 <head>
 	<title></title>
@@ -67,28 +72,29 @@
 	</form> -->
 
 	<!-- version 2 -->
-	<form class="form form-inline" method="post" action="<?php echo BASE_URL().'schedule/monthlyBillCom'?>">
+	<form class="form form-inline" method="get" action="<?php echo BASE_URL().'contract/dailyReport'?>">
 		<div class="form-group" style="position: relative;">
-			<input class="form-control bdate" type="text" name="bdate" placeholder="Date from..." autocomplete="off">
-		</div>
-		<div class="form-group" style="position: relative;">
-			<input class="form-control edate" type="text" name="edate" placeholder="Date to..." autocomplete="off">
-		</div>
-		<div class="form-group" style="position: relative;">
-			<select class="form-control" name="contract_id"  autocomplete="off">
-				<?php foreach($contract as $con){ ?>
-					<option value="<?php echo $con->contract_id; ?>"> <?php echo $con->contract_id_pannell; ?></option>
+			<select class="form-control" name="id"  autocomplete="off">
+				<?php foreach($contractAll as $kcon => $con){ ?>
+					<option value="<?php echo $kcon; ?>" <?php if($id == $kcon){?> selected <?php } ?> > <?php echo $con['contract_id_pannell']; ?></option>
 				<?php } ?>
 			</select>
 		</div>
 		<div class="form-group" style="position: relative;">
+			<input class="form-control date" type="text" name="date" <?php if($date): ?> value="<?php echo $date;?>" <?php endif?> placeholder="Date..." autocomplete="off" required>
+		</div>
+		
+		<!-- <div class="form-group" style="position: relative;">
 			<select class="form-control" name="ifschedule" autocomplete="off"> 
 				<option value=""> All status </option>
 				<option value="1"> Scheduled </option>
 				<option value="2"> Unscheduled </option>
 			</select>
-		</div>
-		<input type="submit" class='btn btn-primary btn-submit'  value='Export to Excel'>
+		</div> -->
+		<input type="hidden" name="ifPrint" id="ifPrint" value="0">
+		<input type="submit" class='btn btn-primary btn-submit'  value='Search'>
+		<input type="submit" class='btn btn-primary btn-submit' onclick="return exportPdf();" value="Export to PDF">
+
 	</form>
 	<hr>
 	
@@ -107,19 +113,19 @@
 							<table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" role="grid" aria-describedby="dataTables-example_info">
 								<thead>
 									<tr role="row">
-										<th class="sorting_asc">
+										<th class="sorting_asc" width="7%">
 											Tract
 										</th>
-										<th class="sorting_asc">
+										<th class="sorting_asc" width="10%">
 											HWY
 										</th>
-										<th class="sorting_asc">
+										<th class="sorting_asc" width="7%">
 											Type
 										</th>
-										<th class="sorting_asc">
+										<th class="sorting_asc" width="25%">
 											From
 										</th>
-										<th class="sorting_asc">
+										<th class="sorting_asc" width="25%">
 											To
 										</th>
 										<th class="sorting_asc" width="8%">
@@ -128,7 +134,7 @@
 										<th class="sorting_asc" width="8%">
 											Cycle
 										</th>
-										<th class="sorting_asc">
+										<th class="sorting_asc" >
 											Comment
 										</th>
 									</tr>

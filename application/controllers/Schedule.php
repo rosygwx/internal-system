@@ -38,6 +38,8 @@ class Schedule extends CI_Controller {
 
 		$this->schedule_update_com_fields = 'SQL_CALC_FOUND_ROWS company.type as company_type, contract.contract_id_pannell, contract.cancel_hour,schedule.task_id, schedule.schedule_id, schedule.location, schedule.schedule_date, schedule.date, schedule.btime_req, schedule.btime, schedule.etime, schedule.working_hour, schedule.disposal_price, schedule.traffic_control_price, schedule.travel_hour, schedule.ifschedule, schedule.status, schedule.comment,schedule.contact, schedule.unit_price, schedule.pon';
 
+		$this->schedule_duplicate = 'schedule.task_id, schedule.btime_req, schedule.location, schedule.comment, schedule.pon, schedule.contact, schedule.ifschedule, schedule.disposal_price, schedule.traffic_control_price, case when schedule.ifschedule = 1 then task.unit_price else unit_price_2 end unit_price';
+
 		$this->employee_lists_fields = 'SQL_CALC_FOUND_ROWS employee.employee_id,employee.first_name,employee.last_name,employee.nick_name,employee.rate';
 		$this->truck_lists_fields = 'SQL_CALC_FOUND_ROWS truck.truck_id, truck.number, truck.type';
 		$this->task_lists_fields = 'SQL_CALC_FOUND_ROWS contract.year,contract.bdate,task.task_id,task.cycle';
@@ -73,11 +75,11 @@ class Schedule extends CI_Controller {
 		isset($input['company']) && !empty($input['company']) ? $like[] = ['name'=>'contract.contract_id_pannell','value'=>$input['company'] ] : '';
 		isset($input['task_id']) && !empty($input['task_id']) ? $where['schedule.task_id'] = $input['task_id']:'';
 		isset($input['category']) && $input['category'] ? $where['task_cat.category'] = $input['category']:'';
-		$where['company.type'] = isset($input['company_type']) && $input['company_type'] != '' ? $input['company_type']:1;
 		$where['schedule.schedule_date >='] = isset($input['bdate']) && $input['bdate'] != '' ? date("Y-m-d", strtotime(urldecode($input['bdate']))):date("Y-m-d");
 		$where['schedule.schedule_date <='] = isset($input['edate']) && $input['edate'] != '' ? date("Y-m-d", strtotime(urldecode($input['edate']))):date("Y-m-d");
 		isset($input['week']) && $input['week'] != '' ? $where['schedule.schedule_week'] = $input['week']:'';
 		isset($input['year']) && $input['year'] != '' ? $where['schedule.schedule_year'] = $input['year']:'';
+		$where['company.type'] =  1;
 		
 
 
@@ -87,9 +89,10 @@ class Schedule extends CI_Controller {
 		$page_dis = isset($input['page']) && $input['page'] != '' ? $input['page'] : 1 ;
 		$pagesize_dis = 10;
 
-		$distinct_result = $this->schedule_model->lists('distinct schedule.schedule_date, contract.contract_id, contract.contract_id_pannell, task_cat.category', $where, '', $json = true, $orderby = ['schedule.schedule_date'=>'desc','contract.contract_id'=>'desc','task_cat.category'=>'asc'], $page_dis, $pagesize_dis, '', 1);
-		//var_dump($distinct_result);
+		$distinct_result = $this->schedule_model->lists('distinct schedule.schedule_date, contract.contract_id, contract.contract_id_pannell, task_cat.category', $where, $like, $json = true, $orderby = ['schedule.schedule_date'=>'desc','contract.contract_id'=>'desc','task_cat.category'=>'asc'], $page_dis, $pagesize_dis, '', 1);
+		//var_dump($distinct_result, $where);
 
+		$where_in = [];
 		if($distinct_result['result']){
 			foreach($distinct_result['result'] as $dis){
 				//$schedule[$dis->schedule_date][$dis->contract_id] = [];
@@ -101,78 +104,76 @@ class Schedule extends CI_Controller {
 				}
 				!in_array($dis->category, $where_in['task_cat.category']) ? $where_in['task_cat.category'][] = $dis->category: '';
 			}
-		}
-		//var_dump($contract);exit;
-		//distince above has set the limitations
-		$page = 1 ;
-		$pagesize = 10000;
-		$where['company.type'] = 1;//txdot
 		
-		
-		//var_dump($where);
-		$result = $this->schedule_model->lists($this->schedule_lists_fields, $where, $like, $json = true, $orderby = ['schedule_date'=>'desc','schedule_id'=>'desc'], $page, $pagesize,$where_in);
-
-
-		$schedule_id_arr = [];
-
-		foreach($result['result'] as $res){
-			//$schedule[$res->schedule_date][$res->contract_id]['hwy_id'][] = $res->hwy_id;
-			$category = $res->category == 1 ? 'De' : 'Sw';
+			//var_dump($contract);exit;
+			//distince above has set the limitations
+			$page = 1 ;
+			$pagesize = 10000;
+			$where['company.type'] = 1;//txdot
 			
-			/*//task, version 1
-			$schedule[$res->schedule_date][$res->contract_id][$res->category]['task'][$res->task_id]['content'] = '('.$category.') Tract: '.$res->tract.' '.$res->hwy_id.' '.$res->tcat_name;
-			$schedule[$res->schedule_date][$res->contract_id][$res->category]['task'][$res->task_id]['status'] = $res->status;
-			$schedule[$res->schedule_date][$res->contract_id][$res->category]['task'][$res->task_id]['mile'] = $res->mile;*/
+			$result = $this->schedule_model->lists($this->schedule_lists_fields, $where, $like, $json = true, $orderby = ['schedule_date'=>'desc','schedule_id'=>'desc'], $page, $pagesize,$where_in);
 
 
-			//task, version 2
-			$temp_type = $this->txdotTypeConvert($res->tcat_id, 0);
-			//var_dump($temp_type, $res->hwy_id);
-			!in_array($temp_type, $schedule[$res->schedule_date][$res->contract_id][$res->category]['task'][$res->hwy_id]) ? $schedule[$res->schedule_date][$res->contract_id][$res->category]['task'][$res->hwy_id][]= $temp_type : '';
+			$schedule_id_arr = [];
+
+			foreach($result['result'] as $res){
+				//$schedule[$res->schedule_date][$res->contract_id]['hwy_id'][] = $res->hwy_id;
+				$category = $res->category == 1 ? 'De' : 'Sw';
+				
+				/*//task, version 1
+				$schedule[$res->schedule_date][$res->contract_id][$res->category]['task'][$res->task_id]['content'] = '('.$category.') Tract: '.$res->tract.' '.$res->hwy_id.' '.$res->tcat_name;
+				$schedule[$res->schedule_date][$res->contract_id][$res->category]['task'][$res->task_id]['status'] = $res->status;
+				$schedule[$res->schedule_date][$res->contract_id][$res->category]['task'][$res->task_id]['mile'] = $res->mile;*/
+
+
+				//task, version 2
+				$temp_type = $this->txdotTypeConvert($res->tcat_id, 0);
+				//var_dump($temp_type, $res->hwy_id);
+				!in_array($temp_type, $schedule[$res->schedule_date][$res->contract_id][$res->category]['task'][$res->hwy_id]) ? $schedule[$res->schedule_date][$res->contract_id][$res->category]['task'][$res->hwy_id][]= $temp_type : '';
 
 
 
-			//overall actual mile
-			$schedule[$res->schedule_date][$res->contract_id][$res->category]['all_mile'] = $schedule[$res->schedule_date][$res->contract_id][$res->category]['all_mile'] ? $schedule[$res->schedule_date][$res->contract_id][$res->category]['all_mile'] + $res->mile * $res->index_centerline : $res->mile*$res->index_centerline;
+				//overall actual mile
+				$schedule[$res->schedule_date][$res->contract_id][$res->category]['all_mile'] = $schedule[$res->schedule_date][$res->contract_id][$res->category]['all_mile'] ? $schedule[$res->schedule_date][$res->contract_id][$res->category]['all_mile'] + $res->mile * $res->index_centerline : $res->mile*$res->index_centerline;
 
 
-			//overall status
-			if(!isset($schedule[$res->schedule_date][$res->contract_id][$res->category]['status'])){
-			$schedule[$res->schedule_date][$res->contract_id][$res->category]['status'] = $res->status;
-			}else{
-				if($schedule[$res->schedule_date][$res->contract_id][$res->category]['status'] == 1 && $res->status == 0 ){
-					$schedule[$res->schedule_date][$res->contract_id][$res->category]['status'] = 0;
+				//overall status
+				if(!isset($schedule[$res->schedule_date][$res->contract_id][$res->category]['status'])){
+				$schedule[$res->schedule_date][$res->contract_id][$res->category]['status'] = $res->status;
+				}else{
+					if($schedule[$res->schedule_date][$res->contract_id][$res->category]['status'] == 1 && $res->status == 0 ){
+						$schedule[$res->schedule_date][$res->contract_id][$res->category]['status'] = 0;
+					}
 				}
-			}
 
-			unset($temp_type,$category);	
+				unset($temp_type,$category);	
+			}
+			
+			//worklog
+			$worklog = [];
+			
+			$where_worklog['worklog.schedule_date'] = $where_in['schedule.schedule_date'];
+			$where_worklog['worklog.contract_id'] = $where_in['contract.contract_id'];
+			$where_worklog['worklog.category'] = $where_in['task_cat.category'];
+			$res_worklog = $this->worklog_model->listsTxdot($this->worklog_lists_fields, $where_worklog, '', $json = true, $orderby = '', 1, 100);
+			
+			foreach($res_worklog['result'] as $rw){
+				$schedule[$rw->schedule_date][$rw->contract_id][$rw->category]['employee'][] = $rw->nick_name.' '.$rw->last_name;
+				$schedule[$rw->schedule_date][$rw->contract_id][$rw->category]['truck'][] = $rw->truck_number;
+			}
+			//var_dump($where_worklog, $res_worklog['result']);
 		}
-		
-		//worklog
-		$worklog = [];
-		
-		$where_worklog['worklog.schedule_date'] = $where_in['schedule.schedule_date'];
-		$where_worklog['worklog.contract_id'] = $where_in['contract.contract_id'];
-		$where_worklog['worklog.category'] = $where_in['task_cat.category'];
-		$res_worklog = $this->worklog_model->listsTxdot($this->worklog_lists_fields, $where_worklog, '', $json = true, $orderby = '', 1, 100);
-		
-		foreach($res_worklog['result'] as $rw){
-			$schedule[$rw->schedule_date][$rw->contract_id][$rw->category]['employee'][] = $rw->nick_name.' '.$rw->last_name;
-			$schedule[$rw->schedule_date][$rw->contract_id][$rw->category]['truck'][] = $rw->truck_number;
-		}
-		
-		
 		//search scope
 		$search['company'] = isset($input['company']) && !empty($input['company']) ? $input['company'] : '';
-		$search['company_type'] = isset($input['company_type']) && !empty($input['company_type']) ? $input['company_type'] : 1;
+		//$search['company_type'] = isset($input['company_type']) && !empty($input['company_type']) ? $input['company_type'] : 1;
 		$search['category'] = isset($input['category']) && $input['category'] ? $input['category'] : 0;
-		$search['status'] = isset($input['status']) && $input['status'] != '' ? (int)$input['status']:'';
+		//$search['status'] = isset($input['status']) && $input['status'] != '' ? (int)$input['status']:'';
 		$search['bdate'] = isset($input['bdate']) && $input['bdate'] != '' ? urldecode($input['bdate']) :date("m/d/Y");
 		$search['edate'] = isset($input['edate']) && $input['edate'] != '' ? urldecode($input['edate']) :date("m/d/Y");
-		$search['date'] = isset($input['date']) ? $input['date'] : date('m-d-Y');
-		$search['week'] = isset($input['week']) && !empty($input['week']) ? $input['week'] : '';
-		$search['year'] = isset($input['year']) && !empty($input['year']) ? $input['year'] : '';
-		$search['period'] = isset($input['period']) && !empty($input['period']) ? $input['period'] : '';
+		//$search['date'] = isset($input['date']) ? $input['date'] : date('m-d-Y');
+		//$search['week'] = isset($input['week']) && !empty($input['week']) ? $input['week'] : '';
+		//$search['year'] = isset($input['year']) && !empty($input['year']) ? $input['year'] : '';
+		//$search['period'] = isset($input['period']) && !empty($input['period']) ? $input['period'] : '';
 		
 		//pagination
 		$total = $distinct_result['total'];
@@ -289,7 +290,7 @@ class Schedule extends CI_Controller {
 		
 		//pagination
 		$total = $result['total'];
-		$url = BASE_URL().'schedule/lists';
+		$url = BASE_URL().'schedule/listsCom';
 		$pageinfo = $this->tool_model->makepage($page,$pagesize,$total,$url,$search);
 		
 
@@ -308,7 +309,7 @@ class Schedule extends CI_Controller {
 	}
 
 	/**
-	* Purpose: Schedule add page
+	* Purpose: Schedule add page (commercial)
 	* @param null
 	* @return: {json}
 	*/
@@ -366,7 +367,7 @@ class Schedule extends CI_Controller {
 			echo "<pre>";
 			//var_dump($input);exit;
 			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : "" ;
-			$company_type = isset($input['company_type']) && !empty($input['company_type']) ? $input['company_type'] : 1 ;
+			$company_type = isset($input['company_type']) && !empty($input['company_type']) ? $input['company_type'] : 2 ;
 			$arr['task_id'] = isset($input['task_id']) && !empty($input['task_id']) ? $input['task_id'] : "" ;
 			$arr['schedule_date'] = isset($input['date']) && !empty($input['date']) ? date("Y-m-d", strtotime(str_replace('-', '/', $input['date']))) : date("Y-m-d");
 			
@@ -450,6 +451,8 @@ class Schedule extends CI_Controller {
 			}
 		}
 	}
+
+
 
 	/**
 	* Purpose: Schedule update page (txdot)
@@ -864,9 +867,58 @@ class Schedule extends CI_Controller {
 	}
 
 
+	/**
+	* Purpose: Duplicate commercial schedule
+	* @param {array} array - id, date, etc.
+	* @return: {json}
+	*/
+	public function duplicate(){
+		$input = $this->input->post();
+		$schedule_id = isset($input['id']) && !empty($input['id']) ? $input['id'] : '';
+		$date = isset($input['date']) && !empty($input['date']) ? date('Y-m-d', strtotime($input['date'])) : '';
+		$btime_req = isset($input['btime_req']) && !empty($input['btime_req']) ? $input['btime_req'] : '';
+		$backurl = isset($input['backurl']) && !empty($input['backurl']) ? urldecode($input['backurl']) : 'schedule/listsCom';
+		//var_dump($input);exit;
+		if($schedule_id && $date){
+			$where_schedule['schedule_id'] = $schedule_id;
+			$res_schedule = $this->schedule_model->lists($this->schedule_duplicate, $where_schedule, '' , $json = true, $orderby = '', 1, 1);
+
+			if($res_schedule['total']){
+				$res_schedule = $res_schedule['result'][0];
+				$addSch['task_id'] = $res_schedule->task_id;
+				$addSch['schedule_year'] = date('Y', strtotime($date));
+				$addSch['schedule_month'] = date('n', strtotime($date));
+				$addSch['schedule_week'] = ltrim(date('W', strtotime($date)), '0');
+				$addSch['schedule_date'] = $date;
+				$addSch['btime_req'] = $btime_req ? $btime_req : $res_schedule->btime_req;
+				$addSch['location'] = $res_schedule->location;
+				$addSch['comment'] = $res_schedule->comment;
+				$addSch['pon'] = $res_schedule->pon;
+				$addSch['contact'] = $res_schedule->contact;
+				$addSch['ifschedule'] = $res_schedule->ifschedule;
+				$addSch['disposal_price'] = $res_schedule->disposal_price;
+				$addSch['traffic_control_price'] = $res_schedule->traffic_control_price;
+				$addSch['unit_price'] = $res_schedule->unit_price;
+				$addSch['addtime'] = date('Y-m-d H:i:s');
+
+				$res_add = $this->schedule_model->add($addSch);
+
+				if($res_add){
+					$this->tool_model->redirect(BASE_URL().$backurl, 'New schedule has been created!');
+				}else{
+					$this->tool_model->redirect(BASE_URL().$backurl, 'Oops, something is missing. Ask technician. Error code #193803.');
+				}
+			}else{
+				$this->tool_model->redirect(BASE_URL().$backurl, 'Oops, something is missing. Ask technician. Error code #193802.');
+			}
+		}else{
+			$this->tool_model->redirect(BASE_URL().$backurl, 'Oops, something is missing. Ask technician. Error code #193801.');
+		}
+	}
+
 
 	/**
-	* Purpose: Complete shedule ajax
+	* Purpose: Complete schedule ajax
 	* @param {array} array - id, date, etc.
 	* @return: {json}
 	*/
@@ -1024,6 +1076,9 @@ class Schedule extends CI_Controller {
 						$color = '#80C0F9';
 						break;
 					case '9'://tarrant aqua
+						$color = '#0289FF';
+						break;
+					case '39'://collin aqua
 						$color = '#0289FF';
 						break;
 					default://grey
@@ -1537,12 +1592,12 @@ class Schedule extends CI_Controller {
 			$whereTicket['schedule.schedule_id'] = $schedule_id;
 			
 			$ticket = $this->worklog_model->lists( $this->ticket_print , $whereTicket, $like = '', $json = true, $orderby = array('worklog.schedule_id'=>'asc'), 1, 500 );
-
-			if($ticket['total']){
+			//var_dump($ticket);
+			if(!$ticket['total']){
 				$data['ticket'] = '';
 			}else{
 				$reg='/(\d{1})/is';//匹配数字的正则表达式
-
+				//var_dump($ticket['result']);
 				foreach($ticket['result'] as $tic){
 					$tic->employee_name = ucwords(strtolower($tic->employee_name));
 					$tic->company_name = ucwords(strtolower($tic->company_name));
@@ -1551,8 +1606,9 @@ class Schedule extends CI_Controller {
 					$tic->schedule_date = date('m/d/Y', strtotime($tic->schedule_date));
 					$tic->btime_req = $tic->btime_req ? date('h:i a', strtotime(date('Y-m-d').' '.$tic->btime_req)) : date('h:i a', strtotime(date('Y-m-d').' '.$tic->btime)) ;
 					$tic->btime = date('h:i a', strtotime(date('Y-m-d').' '.$tic->btime));
+					$tic->etime = date('h:i a', strtotime(date('Y-m-d').' '.$tic->etime));
 					$tic->ifWeekend = in_array(date('N', strtotime($tic->schedule_date)), [6,7]) ? 1: 0;
-
+					//var_dump($tic->schedule_date);
 					//truck type check box
 					switch ($tic->truck_type) {
 						case 1:
@@ -1592,7 +1648,8 @@ class Schedule extends CI_Controller {
 
 					//limit location per line
 					if($tic->location){
-						$length = $curLength = 40;
+						$tic->location = ucwords(strtolower($tic->location));
+						$length = $curLength = 35;
 
 						if(strlen($tic->location) > $length){
 							for($i = $length; $i > 0; $i --){

@@ -11,14 +11,13 @@
 	<div class="container" id="main">
 	  <h3>Contract Lists</h3>
 	  <form class="form form-inline" action="" method='get'>
-	  	<div class="form-group">
-			<!-- <label for="status">Status:</label> -->
+	  	<!-- <div class="form-group">
 			<select name='company_type' class="form-control">
 				<option value='1' <?php if($search['company_type'] ==1){echo 'selected';}?>>TxDOT</option>
 				<option value='2' <?php if($search['company_type'] ==2){echo 'selected';}?>>Commercial</option>
 				
 			</select>
-		</div>
+		</div> -->
 
 		<div class="form-group">
 			<!-- <label for="title">Company Name:</label> -->
@@ -54,6 +53,7 @@
 				  <th>Quote</th>
 				  <th>Price Per Mile</th>
 				  <th>Start Date</th>
+				  <th>Duration</th>
 				  <th>Status</th>
 				  <th>Opt</th>			  
 				</tr>
@@ -66,7 +66,9 @@
 					<td><?php echo $v->contract_id_pannell;?></td>									
 					<td>$<?php echo number_format($v->quote_real,2);?></td>					
 					<td>$<?php echo number_format($v->price_per_mile,2);?></td>								
-					<td><?php if($v->bdate != '0000-00-00')echo date('Y-m-d',strtotime($v->bdate)); else echo "-"; ?></td>	
+					<td><?php if($v->bdate != '0000-00-00')echo date('m/d/Y',strtotime($v->bdate)); else echo "-"; ?></td>	
+
+					<td><?php echo $v->year == 1 ? $v->year.' year': $v->year.' years';?> </td>	
 
 					<?php if($v->status==0){ ?>
 						<td style="color:#999;font-weight:700;">Bidding</td>
@@ -80,15 +82,15 @@
 
 					<td class="text-left" style="width:20%;">
 						<style> .btn-xs { padding-left:0px; padding-right:0px; } </style>
-						<!-- <a href="/contract/view/?contract_id=<?=$v->contract_id?>">View </a> 
-						<a href="/contract/update/?contract_id=<?=$v->contract_id?>">Modify </a>-->
+						<!-- <a href="/contract/view/?contract_id=<?=$v->contract_id?>">View </a> -->
+						<a href="<?php echo BASE_URL()?>contract/update/?id=<?=$v->contract_id?>">Update </a>
 						
-						<?php if(!in_array($v->status,array(0,4))) { ?> 
+						<!-- <?php if(!in_array($v->status,array(0,4))) { ?> 
 							<a href="<?php echo BASE_URL(); ?>task/lists/">Task  </a>
 						<?php } ?>
 						
 						<a href="<?php echo BASE_URL(); ?>task/add/?id=<?=$v->contract_id?>" style="padding-left:3%;">AddTask  </a>
-						<?php //} ?>
+						<?php //} ?> -->
 						
 						
 						<?php //} ?>

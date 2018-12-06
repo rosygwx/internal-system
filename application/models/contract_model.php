@@ -78,7 +78,7 @@ class Contract_model extends CI_Model{
 
 
 	public function add($data, $type=1) {
-		$filds = $type == 1 ? array('contract_id_pannell','contract_id_ori','company_id','quote_real','office','status','sign_date','bdate','year','addtime') : array('contract_id_pannell', 'poc', 'pon', 'company_id', 'status','travel_hour','cancel_hour','office');
+		$filds = $type == 1 ? array('contract_id_pannell','contract_id_ori','company_id','quote_real','office','status','sign_date','bdate','year','addtime') : array('contract_id_pannell', 'poc', 'pon', 'company_id', 'status','travel_hour','cancel_hour','office', 'sign_date');
 		foreach($filds as $value){
 			if( isset($data[$value])  ){
 				$newarr[$value] = $data[$value];
@@ -202,7 +202,7 @@ order by sum desc;';
 		if(!$where){
 			return false;
 		}else{
-			$filds = $type == 1 ? array('contract_id_pannell','contract_id_ori','company_id','quote_real','office','status','sign_date') : array('contract_id_pannell', 'poc', 'pon', 'status','travel_hour','cancel_hour', 'office');
+			$filds = $type == 1 ? array('contract_id_pannell','contract_id_ori','company_id','quote_real','office','status','sign_date','bdate','year') : array('contract_id_pannell', 'poc', 'pon', 'status','travel_hour','cancel_hour', 'office', 'sign_date');
 			foreach($filds as $value){
 				if(isset($data[$value])){
 					$newarr[$value] = $data[$value];

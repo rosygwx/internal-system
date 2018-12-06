@@ -63,7 +63,7 @@
 
 <body>
 	<div class="container" id="main">
-	  <h3>DAILY WORKING SHEET - TxDOT <?php echo $contract['company_name']; ?> COUNTY <?php echo $contract['ori_id']?></h3>
+	  <h3>DAILY WORKING SHEET - TxDOT <?php echo $contractCur['name']; ?> COUNTY <?php echo $contractCur['ori_id']?></h3>
 	  
 	  <table id="summary">
 		<tr role="row">

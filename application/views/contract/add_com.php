@@ -71,7 +71,16 @@
 				var companyName = $(".oldCom").find("option:selected").text();
 				$('#company_name_old').val(companyName);
 			});
+
+			
 		});
+
+		$(function () {
+			$('.datetimepicker').datetimepicker({
+            	format:'MM/DD/YYYY',
+            	//minDate:moment()
+            });
+        });
 
 	</script>
 </head>
@@ -116,6 +125,13 @@
 								<option value="<?php echo $kcom; ?>"><?php echo $vcom; ?></option>
 							<?php } ?>
 						</select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-md-2 control-label">Sign Date:</label>
+					<div class="col-md-10 ">
+						<input type="text" class="form-control datetimepicker" name="sign_date" autocomplete="off" >
 					</div>
 				</div>
 

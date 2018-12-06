@@ -1,6 +1,6 @@
 <?php
 /**
-  * Contract Model
+  * Truck Model
 */
 
 class Truck_model extends CI_Model{

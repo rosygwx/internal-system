@@ -6,9 +6,11 @@
 	 
 	$(function () {
 		console.log('1');
-        $('.datetimepicker').datetimepicker({
-        	format:"MM/YYYY"
-        	//viewMode: 'months'
+        $('.bdate').datetimepicker({
+        	format:"MM/DD/YYYY"
+        });
+        $('.edate').datetimepicker({
+        	format:"MM/DD/YYYY"
         });
     });
 </script>
@@ -24,62 +26,62 @@
 	  <form class="form form-inline" method="get" action="<?php echo BASE_URL().'contract/monthlyBill'?>">
 	  		
 			<div class="form-group" style="position: relative;">
-				<select class="form-control" name="contract_id"  autocomplete="off">
-					<?php foreach($contract as $ckey => $con){ ?>
+				<select class="form-control" name="id"  autocomplete="off">
+					<?php foreach($contractAll as $ckey => $con){ ?>
 						<option value="<?php echo $ckey; ?>"> <?php echo $con['contract_id_pannell']; ?></option>
 					<?php } ?>
 				</select>
 			</div>
 
-			<div class="form-group" >	
-				<div class="date" >
-	         		<input class="form-control datetimepicker" id='' type='text' name='date' format="mm-YYYY" value="<?php //echo date('F', mktime(0, 0, 0, $date['month'], 18)).'-'.$date['year'];
-	         		echo $date['month'].'-'.$date['year']?>" placeholder="Service Month" autocomplete="off">  
+
+			<div class="form-group" style="position: relative;">
+				<input class="form-control bdate" type="text" name="bdate" placeholder="Date from..." <?php if($bdate):?> value="<?php echo $bdate; ?>" <?php endif; ?> autocomplete="off" required>
+			</div>
+			<div class="form-group" style="position: relative;">
+				<input class="form-control edate" type="text" name="edate" placeholder="Date to..." <?php if($edate):?> value="<?php echo $edate; ?>" <?php endif; ?> autocomplete="off" required>
+			</div>
+			
+			<input type="submit" class='btn btn-primary btn-submit'  value='Search'>
+			
+	  </form>
+
+	  <hr>
+	  <?php if($contract_id){?>
+		 <div>
+
+			<div class="form-group">
+				<label class="col-md-2 control-label">Contract Name:</label>
+					<p type="text" class="form-control-static col-md-10" name="company_name"   ><?php echo $contractCur['name'];?>
+					</p>
+			</div>
+
+			<div class="form-group">
+				<label class="col-md-2 control-label">Original Contract ID:</label>
+				<div class="col-md-10">
+					<p type="text" class="form-control-static" name="id_ori"><?php echo $contractCur['ori_id'];?>
+					</p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-md-2 control-label">Total Amount:</label>
+				<div class="col-md-10">
+					<p type="text" class="form-control-static" name="sum"><?php echo "$".number_format($sum[0],2);?>
+					</p>
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-md-2 control-label">Service Month:</label>
+				<div class="col-md-10" >
+	         		<p type="text" class="form-control-static"><?php echo $bdate.' &nbspto '.$edate; ?></p>
 	         	</div>
 			</div>
 			
-			
-			<input type="submit" class='btn btn-primary btn-submit'  value='Search'>
-			<input type="submit" class='btn btn-primary btn-submit'  value='Save to PDF'>
-		</form>
-
-
-
-	 <div>
-
-		<div class="form-group">
-			<label class="col-md-2 control-label">Contract Name:</label>
-				<p type="text" class="form-control-static col-md-10" name="company_name"   ><?php echo $contract['name'];?>
-				</p>
-		</div>
-
-		<div class="form-group">
-			<label class="col-md-2 control-label">Original Contract ID:</label>
-			<div class="col-md-10">
-				<p type="text" class="form-control-static" name="id_ori"><?php echo $contract['ori_id'];?>
-				</p>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label class="col-md-2 control-label">Total Amount:</label>
-			<div class="col-md-10">
-				<p type="text" class="form-control-static" name="sum"><?php echo "$".number_format($sum[0],2);?>
-				</p>
-			</div>
-		</div>
-
-		<div class="form-group" >
-			<label class="col-md-2 control-label">Service Month:</label>
-			<div class="col-md-4 date" >
-         		<input class="form-control datetimepicker" id='' type='text' name='date' format="mm-YYYY" value="<?php //echo date('F', mktime(0, 0, 0, $date['month'], 18)).'-'.$date['year'];
-         		echo $date['month'].'-'.$date['year']?>" autocomplete="off">  
-         	</div>
-		</div>
-		
-	</div>	
-
-	<hr>
+		</div>	
+		<hr>
+	  <?php }?>
+	
 	
 
 
@@ -96,21 +98,28 @@
 							<table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" role="grid" aria-describedby="dataTables-example_info">
 								<thead>
 									<tr role="row">
-										<th class="sorting_asc">
+										<th class="sorting_asc" style="width:7%">
 											Tract
 										</th>
-										<th class="sorting_asc">
+										<th class="sorting_asc" style="width:9%">
 											HWY
 										</th>
-										<th class="sorting_asc">
+										<th class="sorting_asc" style="width:7%">
 											Type
 										</th>
-										<th class="sorting_asc">
-											Section
+										<th class="sorting_asc" style="width:25%">
+											From
+										</th>
+										<th class="sorting_asc" style="width:25%">
+											To
+										</th>
+										<th class="sorting_asc" style="width:15%">
+											Date
 										</th>
 										<th class="sorting_asc">
 											Amount
 										</th>
+										
 									</tr>
 								</thead>
 								<tbody>
@@ -126,7 +135,13 @@
 											<?php echo $vvbi['type']; ?>
 										</td>
 										<td>
-											<?php echo $vvbi['section']; ?>
+											<?php echo $vvbi['section_from']; ?>
+										</td>
+										<td>
+											<?php echo $vvbi['section_to']; ?>
+										</td>
+										<td>
+											<?php echo $vvbi['date']; ?>
 										</td>
 										<td>
 											<?php echo '$'.number_format($vvbi['amount'], 2); ?>
@@ -134,7 +149,7 @@
 									</tr>
 									<?php }?>
 									<tr class="gradA odd" role="row">
-										<td colspan="4">
+										<td colspan="6">
 											Total:
 										</td>
 										<td>

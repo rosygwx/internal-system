@@ -200,7 +200,8 @@
 		}
 
 		.cutLine {
-			border-bottom: 1px dashed black;
+			/*border-bottom: 1px dashed black;*/
+			padding-bottom: 18px;
 		}
 	</style>
 	<script type="text/javascript" src="<?=BASE_URL()?>assets/js/jquery.min.js"></script>
@@ -246,7 +247,7 @@
 						<p class="ptitle">LOCATION</p>
 						<div class="content">&nbsp<?php echo $ticket[$j]->location1; ?></div>
 						<div class="content">&nbsp<?php echo $ticket[$j]->location2; ?></div>
-						<div class="content">&nbsp<?php echo $ticket[$j]->pon; ?></div>		
+						<div class="content">&nbsp<?php echo $ticket[$j]->pon ? $ticket[$j]->pon : ''; ?></div>		
 					</div>
 				</div>
 
@@ -264,7 +265,7 @@
 							<th>DATE</th>
 						</tr>
 						<tr>
-							<td><?php //echo $ticket[$j]->btime;?></td>
+							<td><?php echo $ticket[$j]->btime;?></td>
 							<td><?php echo $ticket[$j]->etime;?></td>
 							<td><?php echo $ticket[$j]->employee_name;?></td>
 							<td><?php echo $ticket[$j]->truck_number;?></td>
