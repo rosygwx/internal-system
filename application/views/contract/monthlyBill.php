@@ -28,7 +28,7 @@
 			<div class="form-group" style="position: relative;">
 				<select class="form-control" name="id"  autocomplete="off">
 					<?php foreach($contractAll as $ckey => $con){ ?>
-						<option value="<?php echo $ckey; ?>"> <?php echo $con['contract_id_pannell']; ?></option>
+						<option value="<?php echo $ckey; ?>" <?php if($contract_id == $ckey){?> selected <?php } ?>> <?php echo $con['contract_id_pannell']; ?></option>
 					<?php } ?>
 				</select>
 			</div>
@@ -59,6 +59,14 @@
 				<label class="col-md-2 control-label">Original Contract ID:</label>
 				<div class="col-md-10">
 					<p type="text" class="form-control-static" name="id_ori"><?php echo $contractCur['ori_id'];?>
+					</p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-md-2 control-label">Total Projected Amount:</label>
+				<div class="col-md-10">
+					<p type="text" class="form-control-static" name="sum_pro"><?php echo "$".number_format($sum_pro,2);?>
 					</p>
 				</div>
 			</div>

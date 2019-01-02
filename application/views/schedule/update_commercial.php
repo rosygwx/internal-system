@@ -494,7 +494,7 @@
 						<div class="form-group "> 
 							<label class="col-md-2 control-label">Driver:</label> 
 							<div class="col-md-10"> 
-								<select class="form-control" id="combobox" name="employee_id[]"> 
+								<select class="form-control"  name="employee_id[]"> 
 									<option value=""></option> 
 									<?php foreach($driver as $dk=>$dv){ ?> 
 										<option value="<?php echo $dk; ?>" <?php if($worklog[$i]->employee_id == $dk){?> selected <?php } ?> ><?php echo $dv; ?></option> 
@@ -505,7 +505,7 @@
 						<div class="form-group"> 
 							<label class="col-md-2 control-label">Truck#:</label> 
 							<div class="col-md-10"> 
-								<select class="form-control" id="combobox" name="truck_id[]"> 
+								<select class="form-control" name="truck_id[]"> 
 									<option value=""></option> 
 									<?php foreach($truck as $tk=>$tv){ ?> 
 										<option value="<?php echo $tk; ?>" <?php if($worklog[$i]->truck_id == $tk){?> selected <?php } ?> ><?php echo $tv; ?></option> 

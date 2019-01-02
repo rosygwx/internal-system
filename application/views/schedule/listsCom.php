@@ -423,7 +423,7 @@
 			<thead>
 				<tr>
 				  <th class="text-left"><input type="checkbox" onclick="check_all(this,'checkall[]')" >  </th>
-				  <th>ScheduleDate</th>
+				  <th>Date</th>
 				  <th>ScheduleStart</th>
 				  <th>Start</th>
 				  <th>End</th>
@@ -469,7 +469,7 @@
 					<td style="width:6%"><?php if($worklog[$v->schedule_id]){
 							foreach($worklog[$v->schedule_id]['ticket_id'] as $wl){?>
 							<span>
-								<?php echo $wl; ?>
+								<?php echo $wl.'   '; ?>
 							</span> 
 							<?php }
 						}else{?>
@@ -480,7 +480,7 @@
 					<td style="width:7%"><?php if($worklog[$v->schedule_id]){
 							foreach($worklog[$v->schedule_id]['employee_id'] as $wl){?>
 								<span>
-									<?php if($wl)  echo $wl; else echo '-'; ?>
+									<?php if($wl)  echo $wl.'   '; else echo '-'.'   '; ?>
 								</span> 
 							<?php }
 							}else{?>
@@ -491,7 +491,7 @@
 					<td style="width: 8%;"><?php if($worklog[$v->schedule_id]){
 							foreach($worklog[$v->schedule_id]['truck_id'] as $wl){?>
 								<span>
-									<?php if($wl)  echo $wl; else echo '-'; ?>
+									<?php if($wl)  echo $wl.'   '; else echo '-'.'   '; ?>
 								</span><br> 
 								<?php }
 							}else{?>
@@ -525,11 +525,14 @@
 
 						<a href="<?php echo BASE_URL();?>schedule/updateCom/?id=<?=$v->schedule_id?>">Update </a> 
 
+						&nbsp
 						
-						<a class="complete" scid="<?php echo $v->schedule_id?>" status="<?php echo $v->status?>"  href="javascript:void(0)"> <?php if($v->status == 0)echo 'Complete';else echo 'Incomplete';?></a> 
+						<!-- <a class="complete" scid="<?php echo $v->schedule_id?>" status="<?php echo $v->status?>"  href="javascript:void(0)"> <?php if($v->status == 0)echo 'Complete';else echo 'Incomplete';?></a>  -->
 
 						<a class="open-AddDialog " data-toggle="modal"  data-id="<?php echo $v->schedule_id;?>" data-employee="<?php echo $v->employeejs;?>" data-btime="<?php echo date('H:i',strtotime($v->btime));?>" data-date="<?php echo $v->date;?>" data-contract="<?php echo $v->contract_id_pannell;?>" data-location="<?php echo $v->location;?>" data-location="<?php echo $v->location;?>" href="#addDialog">Duplicate</a>
 
+						&nbsp
+						
 						<a class="delete" scid="<?php echo $v->schedule_id?>" href="javascript:void(0)"> Delete</a> 
 
 						

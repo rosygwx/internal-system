@@ -47,8 +47,12 @@
 
 	 
 
+        .width9{
+        	width: 9%;
+        }
+
         .width7{
-        	width: 10%;
+        	width: 7%;
         }
 
 		/*.timepicker {
@@ -56,7 +60,7 @@
 		}*/
 
 		.scheduleTable {
-
+			min-height:300px;
 			max-height:700px;
 			overflow-y:scroll;  /*纵向滚动条始终显示 */
 			overflow-x:none;
@@ -108,8 +112,10 @@
 	        	nextTicket = data;
 	        });*/
 	        $('#addScnt').on('click', function() {
-        		var addhtml = '<div id="block_'+i+'" class="lalala"><input type="hidden" name="wl_id[]" value="">  <div class="form-group ui-widget"> <label class="col-md-2 control-label">Driver:</label> <div class="col-md-10"> <select class="form-control" id="combobox" name="employee_id[]"> <option value=""></option> <?php foreach($driver as $dk=>$dr){ ?> <option value="<?php echo $dk; ?>"><?php echo $dr; ?></option> <?php } ?> </select> </div> </div> <div class="form-group"> <label class="col-md-2 control-label">Truck#:</label> <div class="col-md-10"><select class="form-control truck_id" id="combobox" name="truck_id[]"> <option value=""></option> <?php foreach($truck as $tk=>$tv){ ?> <option value="<?php echo $tk; ?>"><?php echo $tv; ?></option> <?php } ?> </select>  </div> </div> </div>';
+        		//var addhtml = '<div id="block_'+i+'" class="lalala"><input type="hidden" name="wl_id[]" value="">  <div class="form-group ui-widget"> <label class="col-md-2 control-label">Driver:</label> <div class="col-md-10"> <select class="form-control" id="combobox" name="employee_id[]"> <option value=""></option> <?php foreach($driver as $dk=>$dr){ ?> <option value="<?php echo $dk; ?>"><?php echo $dr; ?></option> <?php } ?> </select> </div> </div> <div class="form-group"> <label class="col-md-2 control-label">Truck#:</label> <div class="col-md-10"><select class="form-control truck_id" id="combobox" name="truck_id[]"> <option value=""></option> <?php foreach($truck as $tk=>$tv){ ?> <option value="<?php echo $tk; ?>"><?php echo $tv; ?></option> <?php } ?> </select>  </div> </div> </div>';
         		
+        		var addhtml = '<div id="block_'+i+'" class="lalala"> <div class="form-group "> <input type="hidden" name="wl_id[]" value="">             <label class="col-md-1 control-label">Driver:</label> <div class="col-md-3"> <select class="form-control" name="employee_id[]"> <option value="0"></option> <?php foreach($driver as $dk=>$dv){ ?> <option value="<?php echo $dk; ?>" <?php if($worklog[$i]->employee_id == $dk){?> selected <?php } ?> ><?php echo $dv; ?></option> <?php } ?> </select> </div>                 <label class="col-md-1 control-label">Truck#:</label> <div class="col-md-3"> <select class="form-control"  name="truck_id[]"> <option value="0"></option> <?php foreach($truck as $tk=>$tv){ ?> <option value="<?php echo $tk; ?>" <?php if($worklog[$i]->truck_id == $tk){?> selected <?php } ?> ><?php echo $tv; ?></option> <?php } ?> </select> </div>               <label class="col-md-1 control-label">Crew#:</label> <div class="col-md-3"> <select class="form-control"  name="crew_wl_id[]"> <option value=1 <?php if($worklog[$i]->crew_id == 1){?> selected <?php } ?> > 1 </option> <option value=2 <?php if($worklog[$i]->crew_id == 2){?> selected <?php } ?> > 2 </option> <option value=3 <?php if($worklog[$i]->crew_id == 3){?> selected <?php } ?> > 3 </option> </select> </div>          </div>';
+
                 $(addhtml).appendTo(scntDiv);
                 i++;
 			});
@@ -341,7 +347,7 @@
 		</div>
 		<div class="panel-body">
 			<form action="<?php echo BASE_URL();?>schedule/update" method='post' class='form-horizontal' enctype='multipart/form-data' onsubmit="return finalCheck();">
-				<input type='hidden' name='backurl'  id='backurl' value='<?php echo urlencode(trim($_SERVER['PATH_INFO'].'?'.$_SERVER['QUERY_STRING'], '/'))?>' ></input>
+				<input type='hidden' name='backurl'  id='backurl' value='<?=$_SERVER['HTTP_REFERER']?>' ></input>
 				<input type='hidden' name='contract_id'  id='contract_id' value='<?php echo $schedule['contract_id']?>' ></input>
 				<input type='hidden' name='schedule_date'  id='schedule_date' value='<?php echo $schedule['schedule_date']?>' ></input>
 				<input type='hidden' name='category'  id='category' value='<?php echo $schedule['category']?>' ></input>
@@ -383,10 +389,15 @@
 						<input type="text" class="form-control datetimepicker" name="date" id="location" value="<?php echo $schedule['date'];?>" >
 					</div>
 				</div> -->
-
+				
 				<div class="form-group">
 					<label class="col-md-2 control-label">Schedule:</label>
-					<div class="col-md-10 scheduleTable">
+					
+				</div>
+
+				<div class="form-group">
+					<!-- <label class="col-md-2 control-label">Schedule:</label> -->
+					<div class="col-md-12 scheduleTable">
 						<table class="table table-responsive table-striped table-bordered table-hover dataTable no-footer dtr-inline">
 							<thead>
 								<tr>
@@ -396,10 +407,11 @@
 									<th>From</th>
 									<th>To</th>
 									<th>Mile</th>
-									<th class="width7">Schedule<br>Date</th>
+									<th class="width9">Schedule<br>Date</th>
 									<th class="width7">Start<br>Time</th>
 									<th class="width7">Stop<br>Time</th>
-									<th class="width7">Complete<br>Date</th>
+									<th class="width9">Complete<br>Date</th>
+									<th class="width9">Crew</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -419,7 +431,13 @@
 									<td class="date"><input class="timepicker form-control" type="text" name="btime[]" value="<?php echo $t['btime'];?>" autocomplete="off"></td>
 									<td class="date"><input class="timepicker form-control" type="text" name="etime[]" value="<?php echo $t['etime'];?>" autocomplete="off"></td>
 									<td class="date"><input class="datetimepicker form-control" type="text" name="date[]" value="<?php echo $t['date'];?>" autocomplete="off"></td>
-
+									<td>
+										<select class="form-control" name="crew_id[]">
+											<option value="1" <?php if($t['crew_id'] == 1){?> selected <?php } ?> >1</option>
+											<option value="2" <?php if($t['crew_id'] == 2){?> selected <?php } ?> >2</option>
+											<option value="3" <?php if($t['crew_id'] == 3){?> selected <?php } ?> >3</option>
+										</select>
+									</td>
 									<!-- <td><input class="status-schedule" type="checkbox" name="status[]" value="<?php echo $t['schedule_id']?>" <?php if($t['status']==1){ ?> checked <?php } ?> ></td> -->
 								</tr>
 							<?php } ?>
@@ -444,34 +462,38 @@
 					<?php if($worklog){ for($i=0;$i<count($worklog);$i++){ ?>
 					<div id="block_<?php echo $i+1; ?>" class="lalala"> 
 						<input type="hidden" name="wl_id[]" value="<?php echo $worklog[$i]->wl_id; ?>">
-						<!-- <div class="form-group"> 
-							<label class="col-md-2 control-label">Ticket #:</label> 
-							<div class="col-md-10"> 
-								<input type="text" class="form-control" name="ticket_id[]" value="<?php echo $worklog[$i]->ticket_id; ?>"> 
-							</div> 
-						</div>  -->
 						<div class="form-group "> 
-							<label class="col-md-2 control-label">Driver:</label> 
-							<div class="col-md-10"> 
-								<select class="form-control" id="combobox" name="employee_id[]"> 
-									<option value=""></option> 
+							<label class="col-md-1 control-label">Driver:</label> 
+							<div class="col-md-3"> 
+								<select class="form-control" name="employee_id[]"> 
+									<option value="0"></option> 
 									<?php foreach($driver as $dk=>$dv){ ?> 
 										<option value="<?php echo $dk; ?>" <?php if($worklog[$i]->employee_id == $dk){?> selected <?php } ?> ><?php echo $dv; ?></option> 
 									<?php } ?> 
 								</select> 
 							</div> 
-						</div> 
-						<div class="form-group"> 
-							<label class="col-md-2 control-label">Truck#:</label> 
-							<div class="col-md-10"> 
-								<select class="form-control" id="combobox" name="truck_id[]"> 
-									<option value=""></option> 
+
+							<label class="col-md-1 control-label">Truck#:</label> 
+							<div class="col-md-3"> 
+								<select class="form-control" name="truck_id[]"> 
+									<option value="0"></option> 
 									<?php foreach($truck as $tk=>$tv){ ?> 
 										<option value="<?php echo $tk; ?>" <?php if($worklog[$i]->truck_id == $tk){?> selected <?php } ?> ><?php echo $tv; ?></option> 
 									<?php } ?> 
 								</select> 
 							</div> 
+
+							<label class="col-md-1 control-label">Crew#:</label> 
+							<div class="col-md-3"> 
+								<select class="form-control" name="crew_wl_id[]"> 
+									<option value=1 <?php if($worklog[$i]->crew_id == 1){?> selected <?php } ?> > 1 </option> 
+									<option value=2 <?php if($worklog[$i]->crew_id == 2){?> selected <?php } ?> > 2 </option> 
+									<option value=3 <?php if($worklog[$i]->crew_id == 3){?> selected <?php } ?> > 3 </option> 
+									
+								</select> 
+							</div> 
 						</div> 
+						
 					</div>
 					<?php } } ?>
 				</div>

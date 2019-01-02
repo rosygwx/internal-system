@@ -363,13 +363,13 @@
 			<thead>
 				<tr>
 				  <th class="text-left"><input type="checkbox" onclick="check_all(this,'checkall[]')" >  </th>
-				  <th style="width:12%">Schedule Date</th>
+				  <th style="width:10%">Schedule Date</th>
 				  <th style="width:15%">Contract</th>
-				  <th style="width:12%">Category</th>
-				  <th style="width:12%">Actual Mileage</th>
-				  <th style="">Task</th>
-				  <th>Driver</th>
-				  <th>Truck</th>
+				  <th style="width:10%">Category</th>
+				  <th style="width:160px">Actual Mileage</th>
+				  <th style="width:200px">Task</th>
+				  <th style="width:250px">Driver</th>
+				  <th style="width:100px">Truck</th>
 				  
 				  <!-- <th>Start Time</th>
 				  <th>End Time</th>
@@ -388,7 +388,7 @@
 					<?php foreach($scvv as $category => $scvvv){?>
 						<?php if($scvvv['status']===0){ ?>
 							<!--<tr class="warning">-->
-							<tr class="info">
+							<!-- <tr class="info"> -->
 						<?php }elseif($scvvv['status']==1){ ?>
 							<tr class="success">
 						<?php }elseif($scvvv['status']==2){ ?>
@@ -405,48 +405,64 @@
 
 							<td><?php echo $category==1?'Debris':'Sweeping';?></td>
 
-							<td><?php echo $scvvv['all_mile'];?></td>
 
-							<td>
-							<!-- <?php //version 1
-								foreach($scvvv['task'] as $task) {?>
-								<?php echo $task['content']; }?> -->
 
-								<?php //version 2
-								foreach($scvvv['task'] as $hwy_id => $types){ 
-								 	echo $hwy_id.': '; 
-								 	$typpee = '';
-									foreach($types as $type){
-										$typpee .= $type.', ';
-									}
-									
-									echo trim($typpee, ', ').'<br>';
-								}?>
+							<td colspan="4">
+								<table rules="rows" >
+									<?php foreach($scvvv['crew'] as $scvvvk=>$crew) {?>
+	        							<tr>
+	        								<td style="width:170px;  padding: 8px"><?php echo $crew['all_mile'];?></td>
+	        							
+	        								<td style="width:200px">
+												<?php //version 2
+												foreach($crew['task'] as $hwy_id => $types){ 
+												 	echo $hwy_id.': '; 
+												 	$typpee = '';
+													foreach($types as $type){
+														$typpee .= $type.', ';
+													}
+													
+													echo trim($typpee, ', ').'<br>';
+												}?>
 
-							</td>
-							<td style="max-width:90px">
-								<?php if($scvvv['employee']){
-										foreach( $scvvv['employee'] as $employee){
-											echo $employee.'<br>';
-										}
-									}else{
-										echo '-';
-									}
-								?>	
-							</td>
-							<td style="max-width:90px">
-								<?php if($scvvv['truck']){
-										foreach( $scvvv['truck'] as $truck){
-											echo $truck.'<br>';
-										}
-									}else{
-										echo '-';
-									}
-								?>
-							</td>
+											</td>
+											<td style="width:170px">
+												<?php if($crew['employee']){
+														foreach( $crew['employee'] as $employee){
+															echo $employee.'<br>';
+														}
+													}else{
+														echo '-';
+													}
+												?>	
+											</td>
+											<td style="width:170px">
+												<?php if($crew['truck']){
+														foreach( $crew['truck'] as $truck){
+															echo $truck.'<br>';
+														}
+													}else{
+														echo '-';
+													}
+												?>
+											</td>
+										</tr>
+	        						<?php } ?>
+        						</table>
+        					</td>
+								
+
+								
+
+
+							
+
+
 							<td>
 								<!-- <a class="open-AddDialog " data-toggle="modal"  data-id="<?php  ?>" data-employee="<?php  ?>" data-btime="<?php ?>" data-etime="<?php ?>" data-date="<?php ?>"  data-contract="<?php ?>" data-location="<?php ?>"  href="#addDialog">Setup</a> -->
-								<a href="<?php echo BASE_URL();?>schedule/update/?id=<?php echo $contract_id?>&date=<?php echo $date?>&cat=<?php echo $category?>">Update </a> 
+								<!-- <a href="<?php echo BASE_URL();?>schedule/update/?id=<?php echo $contract_id?>&date=<?php echo $date?>&cat=<?php echo $category?>">Update </a>  -->
+								<a href="<?php echo BASE_URL().'schedule/update/?id='.$contract_id.'&date='.$date.'&cat='.$category; ?>">Update </a> 
+
 							</td>
 						</tr>
 					<?php } ?>
@@ -461,6 +477,7 @@
 			</form>
 		</table>
 	
+
 
 	<div class="pull-right"> 
 		<?php $this->load->view('template/page.php');?>     

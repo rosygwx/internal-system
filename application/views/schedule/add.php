@@ -44,6 +44,7 @@
 		    padding: 0.3em;
 		    background-color: white;
 		  }
+
 	</style>
 
 	<script>
@@ -480,7 +481,7 @@
 				<hr>
 
 				<div class="form-group" >
-					<div class="col-md-4 text-center" >
+					<div class="col-md-12 text-center" >
 	                    <input type='button' class="btn btn-primary" id='addScnt' value="Add A Ticket">
 	                </div> 
 				</div>

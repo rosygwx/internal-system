@@ -75,9 +75,15 @@
 		.body, .title, .p1, .p2, .p3, .p4 {
 			margin-left: 20px;
 			margin-right: 20px;
+			
 			/*text-align: center;*/
 			width: 900px;
+
 			font-size: 18px;
+		}
+
+		body {
+			padding-bottom: 0px;
 		}
 
 		.title, .p1 , .p4{
@@ -201,7 +207,7 @@
 
 		.cutLine {
 			/*border-bottom: 1px dashed black;*/
-			padding-bottom: 18px;
+			padding-bottom: 65px;
 		}
 	</style>
 	<script type="text/javascript" src="<?=BASE_URL()?>assets/js/jquery.min.js"></script>
@@ -288,7 +294,7 @@
 								<input type="checkbox" onclick="return false;" <?php if($ticket[$j]->ifTrafficControl == 1){?> checked <?php } ?>>Traffic Control
 							</td>
 							<td colspan="2">
-								<strong>&nbsp&nbsp&nbsp&nbsp&nbsp&nbspAddtional Comments:</strong>
+								<strong>&nbsp&nbsp&nbsp&nbsp&nbsp&nbspAdditional Comments:</strong>
 							</td>
 						</tr>
 						<tr>
@@ -298,7 +304,7 @@
 							<td>
 								<input type="checkbox" onclick="return false;" <?php if($ticket[$j]->ifDisposal == 1){?> checked <?php } ?>>Disposal
 							</td>
-							<td  colspan="2">
+							<td  colspan="2" >
 								<div><?php echo $ticket[$j]->comment1; ?></div>
 							</td>
 						</tr>
@@ -316,7 +322,9 @@
 							<td>
 								<input type="checkbox" onclick="return false;" <?php if($ticket[$j]->ifVac == 1){?> checked <?php } ?>>Vacuum Sweeper
 							</td>
-							<td  colspan="2"></td>
+							<td  colspan="2">
+								<div><?php echo $ticket[$j]->comment3; ?></div>
+							</td>
 						</tr>
 					</table>
 				</div>
@@ -344,9 +352,9 @@
 
 
 			</div>
-			<br>
+			
 			<?php if($i % 2 == 0) {?><div class="cutLine"></div><?php } ?>
-			<br>
+			
 			
 		<?php } ?>
 	<?php }else{

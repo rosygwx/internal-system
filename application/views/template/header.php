@@ -137,7 +137,7 @@
 	    </div>
 	    <ul class="nav navbar-text " style="float:right;">
 	    	<p class="">Welcome, <?php echo $user['nick_name']; ?> 
-	    		<a href="<?php echo BASE_URL().'login/logout/?fromurl='.str_replace('/ci/', '', $_SERVER["REQUEST_URI"]); ?>">Logout</a>
+	    		<a href="<?php echo BASE_URL().'login/logout'; ?>">Logout</a>
 	    	</p> 
 	    </ul>	      
 	  </div>

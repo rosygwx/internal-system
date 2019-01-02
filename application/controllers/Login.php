@@ -57,7 +57,7 @@ class Login extends CI_Controller {
 		//var_dump($data);exit;
 		$username = isset($data['username']) && !empty($data['username']) ? $data['username'] : '';
 		$password = isset($data['password']) && !empty($data['password']) ? md5($data['password']) : '';
-		$fromurl = 	isset($data['fromurl']) && !empty($data['fromurl']) ? $data['fromurl'] : 'schedule/lists?company_type=2';//fromurl=<?php echo urlencode($_SERVER['REQUEST_URI']); ? >
+		$fromurl = 	isset($data['fromurl']) && !empty($data['fromurl']) ? $data['fromurl'] : BASE_URL().'schedule/lists?company_type=2';//fromurl=<?php echo urlencode($_SERVER['REQUEST_URI']); ? >
 		//var_dump($fromurl);
 		/*
 		if(isset($_POST['g-recaptcha-response'])){
@@ -76,7 +76,7 @@ class Login extends CI_Controller {
 			
 			if( ($username == '') || ($password == '') )
 			{
-				$this->tool_model->redirect(BASE_URL().'login','Username or password is missing.');
+				$this->tool_model->redirect($fromurl,'Username or password is missing.');
 				exit;
 			}else{
 
@@ -102,9 +102,9 @@ class Login extends CI_Controller {
 					$this->session->set_userdata('user', $user);
 					
 					//$hint = 'Login success.';
-					$this->tool_model->redirect(BASE_URL().$fromurl,'Login success.');exit;
+					$this->tool_model->redirect($fromurl,'Login success.');exit;
 				}else{
-					$this->tool_model->redirect(BASE_URL().'login?fromurl='.$fromurl,'Login failure. Please try again.');exit;
+					$this->tool_model->redirect(BASE_URL().'login/?fromurl='.BASE_URL().'schedule/lists','Login failure. Please try again.');exit;
 				}
 			
 			
@@ -121,7 +121,7 @@ class Login extends CI_Controller {
 	{
 		$user = $this->session->userdata('user');
 		$input = $this->input->get();
-		$data['fromurl'] = 	isset($input['fromurl']) && !empty($input['fromurl']) ? $input['fromurl'] : 'schedule/lists/?type=2';//fromurl=<?php echo urlencode($_SERVER['REQUEST_URI']); ? > 
+		$data['fromurl'] = 	isset($input['fromurl']) && !empty($input['fromurl']) ? $input['fromurl'] : '';//fromurl=<?php echo urlencode($_SERVER['REQUEST_URI']); ? > 
 		if($user){
 			$this->session->set_userdata('user', '');
 			//$data['current'] = $this->current_home;

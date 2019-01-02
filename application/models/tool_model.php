@@ -565,7 +565,7 @@ class Tool_model extends CI_Model {
 					$update['scheduleMonth'] = date('n', strtotime($scheduleDate));
 					$update['scheduleWeek'] = date('W', strtotime($scheduleDate));
 
-					$arrUpdate .= "(".$update['taskId']."', '".$update['unitPrice']."', '".$update['scheduleYear']."', '".$update['scheduleMonth']."','".$update['scheduleWeek']."','".$update['scheduleDate']."'),";//Schedule_id, Year, Month, Week, Date
+					$arrUpdate .= "(".$update['taskId']."', '".$update['unitPrice']."', '".$update['scheduleYear']."', '".$update['scheduleMonth']."','".$update['scheduleWeek']."','".$update['scheduleDate']."','1'),";//Schedule_id, Year, Month, Week, Date
 					var_dump($update, $dareYouTouchMyStartDate, $freAddNum, $freAddUnit);
 
 
@@ -585,7 +585,7 @@ class Tool_model extends CI_Model {
 
 				exit;
 
-				$res = $con->query('insert INTO schedule (task_id, unit_price, schedule_year, schedule_month, schedule_week, schedule_date)
+				$res = $con->query('insert INTO schedule (task_id, unit_price, schedule_year, schedule_month, schedule_week, schedule_date, crew_id)
 					VALUES
 					'.$arrUpdate.'
 					ON DUPLICATE KEY UPDATE

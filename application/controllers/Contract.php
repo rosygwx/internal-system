@@ -18,12 +18,13 @@ class Contract extends CI_Controller {
 		$this->load->model('tool_model');
 		$this->user = $this->session->userdata('user');
 		if(!$this->user){
-			$this->tool_model->redirect(BASE_URL().'login/?fromurl='.str_replace('/ci/', '', $_SERVER["REQUEST_URI"]),'Please login.');
+			$this->tool_model->redirect(BASE_URL().'login','Please login.');
 		}
 		//var_dump($this->session->userdata('user'));
 		$this->load->model('contract_model');
 		$this->load->model('company_model');
 		$this->load->model('task_model');
+		$this->load->model('worklog_model');
 		$this->load->model('tool_model');
 
 		$this->contract_lists_fields_txdot = 'SQL_CALC_FOUND_ROWS company.company_name as company,company.phone as phone,contract.sign_date as signdate,contract.status as status, contract.contract_id_pannell, contract.contract_id_ori, contract.contract_id, contract.addtime as addtime, contract.bdate as bdate, contract.quote_real, a.price_per_mile, contract.year';
@@ -34,7 +35,7 @@ class Contract extends CI_Controller {
 		$this->contract_update_fields_txdot = 'company.company_name, contract.contract_id, contract.contract_id_pannell,  contract.contract_id_ori, contract.quote_real, contract.company_id, contract.sign_date, contract.bdate, contract.year,  contract.office';
 		$this->company_fields = 'company_id, company_name, type';
 		$this->task_category_fields = 'tcat_id, category, tcat_name';
-		$this->bill_fields = 'schedule.schedule_id, schedule.comment, schedule.date, task.tcat_id, task.tract, task.hwy_id, task.section_from, task.section_to, task.unit_price, task.mile,  task.cycle, contract.contract_id_pannell, task_cat.category, task_cat.tcat_name type, task_cat.index_centerline , company.type company_type';
+		$this->bill_fields = 'schedule.schedule_id, schedule.comment, schedule.date, schedule.btime, schedule.etime, task.tcat_id, task.tract, task.hwy_id, task.section_from, task.section_to, task.unit_price, task.mile,  task.cycle, contract.contract_id_pannell, task_cat.category, task_cat.tcat_name type, task_cat.index_centerline, task.frequency , company.type company_type';
 
 		$this->current = 'contract';//nevigation
 		$this->currentRev = 'revenue';//nevigation
@@ -133,7 +134,7 @@ class Contract extends CI_Controller {
 				$this->load->view('contract/add_txdot',$data);
 				
 			}else{
-				echo '<pre>';
+				//echo '<pre>';
 				//var_dump($input,$_FILES['csv']['tmp_name']);exit;
 
 				$ifNewCom = isset($input['newCom']) && !empty($input['newCom']) ? $input['newCom'] : 0;
@@ -148,7 +149,7 @@ class Contract extends CI_Controller {
 				$arrContract['status'] = 1;
 				$arrContract['addtime'] = date('Y-m-d H:i:s');
 
-				$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : BASE_URL.'contract/lists';
+				$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] :	$_SERVER['HTTP_REFERER'] ;;
 
 				if($ifNewCom == 1){//a new company
 					//add company attributes
@@ -240,7 +241,7 @@ class Contract extends CI_Controller {
 			//echo '<pre>';
 			//var_dump($input);exit;
 
-			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : BASE_URL().'contract/addCom';
+			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : $_SERVER['HTTP_REFERER'];
 
 			//add contract attributes
 			$arrContract['poc'] = isset($input['poc']) && !empty($input['poc']) ? $input['poc'] : '';
@@ -321,7 +322,7 @@ class Contract extends CI_Controller {
 		$input = $this->input->get();
 		$contract_id = isset($input['id']) && !empty($input['id']) ? $input['id'] : '';
 		if($contract_id){
-			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : BASE_URL().'contract/lists/?company_type=1';
+			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : $_SERVER['HTTP_REFERER'];
 			$where['contract.contract_id'] = $contract_id;
 			$result = $this->contract_model->lists($this->contract_update_fields_txdot, $where, '' , $json = true, $orderby = '', 1, 1);
 			if(!$result['result']){
@@ -349,7 +350,7 @@ class Contract extends CI_Controller {
 			$input = $this->input->post();
 			//var_dump($input);exit;
 			$contract_id = isset($input['id']) && !empty($input['id']) ? $input['id'] : '';
-			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : BASE_URL().'contract/lists/?company_type=1';
+			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : $_SERVER['HTTP_REFERER'];
 
 			if(!$contract_id){
 				$this->tool_model->redirect($backurl,'Oops, something is missing. Ask technician. Error code #3151402');exit;
@@ -385,7 +386,6 @@ class Contract extends CI_Controller {
 		$input = $this->input->get();
 		$contract_id = isset($input['id']) && !empty($input['id']) ? $input['id'] : '';
 		if($contract_id){
-			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : BASE_URL().'contract/lists/?company_type=2';
 			$where['contract.contract_id'] = $contract_id;
 			$result = $this->contract_model->lists($this->contract_update_fields, $where, '' , $json = true, $orderby = '', 1, 1);
 			if(!$result['result']){
@@ -410,7 +410,7 @@ class Contract extends CI_Controller {
 
 			$contract_id = isset($input['contract_id']) && !empty($input['contract_id']) ? $input['contract_id'] : '';
 			$task_id = isset($input['task_id']) && !empty($input['task_id']) ? $input['task_id'] : '';
-			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : BASE_URL().'contract/lists/?company_type=2';
+			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : $_SERVER['HTTP_REFERER'];
 
 			if(!$contract_id || !$task_id){
 				$this->tool_model->redirect($backurl,'Oops, something is missing. Ask technician. Error code #3151401');exit;
@@ -539,7 +539,7 @@ class Contract extends CI_Controller {
 			$contract[$value->contract_id] = ['contract_id_pannell' => $value->contract_id_pannell, 'contract_id_ori'=>$value->contract_id_ori]; 
 		}
 		$data['contractAll'] = $contract;
-
+		
 		if($contract_id){
 			//bill
 			$where_bill['task.contract_id'] = $contract_id;
@@ -569,11 +569,20 @@ class Contract extends CI_Controller {
 			//selected contract
 			$contractCur = ['name' => $contract[$contract_id]['contract_id_pannell'], 'id' => $contract_id ,'ori_id' => $contract[$contract_id]['contract_id_ori']];
 
+			//projected amount
+			$where_bill_pro['task.contract_id'] = $contract_id;
+			$where_bill_pro['schedule.ori_date >='] = $bdate; 
+			$where_bill_pro['schedule.ori_date <='] = $edate; 
+			$res_bill_pro = $this->contract_model->bill('sum(task.unit_price) as sum', $where_bill_pro, $like = "", $json = true, $orderby = "", 1, 2000);
+			$sum_pro = $res_bill_pro['result'][0]->sum;
+			
+
 			$data['bill'] = $bill;
 			$data['task_cat'] = $task_cat;
 			$data['contractCur'] = $contractCur;
 			$data['contract_id'] = $contract_id;
 			$data['sum'] = $sum;
+			$data['sum_pro'] = $sum_pro;
 			$data['bdate'] = date('m/d/Y', strtotime($bdate));
 			$data['edate'] = date('m/d/Y', strtotime($edate));
 			$data['current'] = $this->currentRep;
@@ -604,42 +613,103 @@ class Contract extends CI_Controller {
 			$contract[$value->contract_id] = ['contract_id_pannell' => $value->contract_id_pannell, 'contract_id_ori'=>$value->contract_id_ori]; 
 		}
 
-		
-
 		if($contract_id){
 			//report
 			$where_report['task.contract_id'] = $contract_id;
-			$date = isset($input['date']) && !empty($input['date']) ? date('Y-m-d', strtotime(urldecode($input['date']))) : date('Y-m-d');
+			$date = $where_report['schedule.date'] = isset($input['date']) && !empty($input['date']) ? date('Y-m-d', strtotime(urldecode($input['date']))) : date('Y-m-d');
 			$ifPrint = isset($input['ifPrint']) && !empty($input['ifPrint']) ? $input['ifPrint'] : 0;
-
-			$where_report['schedule.date'] = $date; 
 			
 			$res_report = $this->contract_model->bill($this->bill_fields, $where_report, $like = "", $json = true, $orderby = ['task.tcat_id'=>'asc']);
-			//var_dump($where_report);
-			$report = [];
-			$task_cat = [];
-			$sum = [];
-			$sum[0] = 0;
-			foreach($res_report['result'] as $res){
-				$report[$res->tcat_id][] = ['tract' => $res->tract, 'schedule_id' => $res->schedule_id, 'hwy_id' => $res->hwy_id, 'to' => $res->section_to, 'from' => $res->section_from, 'amount' => number_format($res->unit_price, 2), 'type' => $res->type, 'mile' => number_format($res->mile, 2), 'cycle' => $res->cycle] ;
-				//$sum[$res->tcat_id] += $res->unit_price;
-				//$sum[0] += $res->unit_price;
-				$sum[$res->tcat_id] += $res->mile * $res->index_centerline;
-				$sum[0] += $res->mile * $res->index_centerline;
-				if(!in_array($res->tcat_id, $task_cat)){
-					$category = $res->category == 1 ? "Debris" : "Sweeping" ;
-					$task_cat[$res->tcat_id] = ['type' => $res->type, 'category' => $category];
-				}  
+
+			//var_dump($where_report, $res_report);
+
+			if($res_report['result']){
+				
+				$report = [];
+				$task_cat = [];
+				$sum = [];
+				$schedule_id_arr = [];
+				$sum[0] = 0;
+				$time = [];
+				foreach($res_report['result'] as $res){
+					$schedule_id_arr[] = $res->schedule_id;
+
+					$btime = $res->btime ? date('H:i a', strtotime($res->btime)) : '';
+					$etime = $res->etime ? date('H:i a', strtotime($res->etime)) : '';
+
+					$report[$res->category][$res->tcat_id][] = ['tract' => $res->tract, 'schedule_id' => $res->schedule_id, 'hwy_id' => $res->hwy_id, 'to' => $res->section_to, 'from' => $res->section_from, 'amount' => number_format($res->unit_price, 2), 'type' => $res->type, 'mile' => number_format($res->mile, 2), 'cycle' => $res->cycle , 'comment'=> $btime.'-'.$etime , 'frequency' => $res->frequency ] ;
+					
+					//$sum[$res->tcat_id] += $res->unit_price;
+					//$sum[0] += $res->unit_price;
+					$sum[$res->tcat_id] += $res->mile * $res->index_centerline;
+					$sum[0] += $res->mile * $res->index_centerline;
+					if(!in_array($res->tcat_id, $task_cat)){
+						$category = $res->category == 1 ? "Debris" : "Sweeping" ;
+						$task_cat[$res->tcat_id] = ['type' => $res->type, 'category' => $category];
+					}  
+
+					
+					$res->btime && (!$time[$res->category]['from'] || $res->btime < $time[$res->category]['from']) ? $time[$res->category]['from'] = $btime : '';
+					$res->etime && (!$time[$res->category]['to'] || $res->etime > $time[$res->category]['to']) ? $time[$res->category]['to'] = $etime : '';
+
+					unset($btime, $etime);
+				}
+				
+				//worklog
+				$whereWl['worklog.contract_id'] = $contract_id;
+				$whereWl['worklog.schedule_date'] = $date;
+				$resWl = $this->worklog_model->listsTxdot('worklog.employee_id, employee.nick_name, worklog.truck_id, truck.number, truck.type, worklog.category', $whereWl , $like = '', true, $orderby = array('wl_id'=>'asc'), 1, 500);
+				//var_dump($whereWl,$resWl);
+				if($resWl['total']){
+					$driver = [];
+					$truck = [];
+					$truckType = [];
+					//$intro = [];
+					foreach($resWl['result'] as $wl){
+						$wl->nick_name ? $driver[$wl->category][] = $wl->nick_name : '';
+						if($wl->number){
+							$truck[$wl->category][] = $wl->number;
+							switch ($wl->type) {
+								case 1:
+									$truckType[$wl->category]['sweeper'] .= $wl->number.',';
+									break;
+								case 2:
+									$truckType[$wl->category]['sweeper'] .= $wl->number.',';
+									break;
+								case 3:
+									$truckType[$wl->category]['debris'] .= $wl->number.',';
+									break;
+								case 4:
+									$truckType[$wl->category]['tma'] .= $wl->number.',';
+									break;
+								default:
+									break;
+							}
+						}
+						
+					}
+				}
+				foreach($truckType as $cat=>$type){
+					foreach($type as $key => $trt){
+						$truckType[$cat][$key] = trim( $truckType[$cat][$key] , ',');
+					}
+				}
+
+				$data['report'] = $report;
+				$data['time'] = $time;
+				$data['task_cat'] = $task_cat;
+				$data['sum'] = $sum;
+				$data['driver'] = $driver;
+				$data['truck'] = $truck;
+				$data['truckType'] = $truckType;
+
+				$data['intro'] = $intro;
 			}
-			
 			
 			//contract
 			$contractCur = ['name' => $contract[$contract_id]['contract_id_pannell'], 'id' => $contract_id ,'ori_id' => $contract[$contract_id]['contract_id_ori']];
 
 			$data['id'] = $contract_id;
-			$data['report'] = $report;
-			$data['task_cat'] = $task_cat;
-			$data['sum'] = $sum;
 			$data['contract'] = $contract;
 			$data['contractCur'] = $contractCur;
 			$data['date'] = date('m/d/Y', strtotime($date));
@@ -649,7 +719,8 @@ class Contract extends CI_Controller {
 
 		$data['current'] = $this->currentRep;
 		$data['contractAll'] = $contract;
-		//var_dump($data);
+		//echo '<pre>';
+		//var_dump($data['report']);
 		//var_dump($bill[7], $sum, $data['date'] );
 		if($ifPrint==0){
 			$this->load->view("contract/dailyReport",$data);

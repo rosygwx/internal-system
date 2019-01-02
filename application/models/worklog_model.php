@@ -143,7 +143,7 @@ class Worklog_model extends CI_Model{
 
 
 	public function add($data) {
-		$filds = array('schedule_id', 'contract_id', 'schedule_date', 'category', 'ticket_id', 'employee_id','truck_id', 'employee_rate', 'ifbill','status','addtime');
+		$filds = array('schedule_id', 'contract_id', 'schedule_date', 'category', 'crew_id', 'ticket_id', 'employee_id','truck_id', 'employee_rate', 'ifbill','status','addtime');
 		foreach($filds as $value){
 			if( isset($data[$value])  ){
 				$newarr[$value] = $data[$value];
@@ -157,7 +157,7 @@ class Worklog_model extends CI_Model{
 	}
 
 	public function add_batch($data) {
-		$filds = array('schedule_id', 'ticket_id', 'employee_id','truck_id', 'employee_rate', 'ifbill','status','addtime');
+		$filds = array('schedule_id', 'ticket_id', 'employee_id','truck_id', 'crew_id', 'employee_rate', 'ifbill','status','addtime');
 		$newarr = [];
 		foreach($data as $da){
 			foreach($filds as $value){
@@ -175,7 +175,7 @@ class Worklog_model extends CI_Model{
 	
 	
 	public function update($data,$where){
-		$filds = array('ticket_id', 'employee_id','truck_id', 'employee_rate', 'ifbill','status', 'isdeleted');
+		$filds = array('ticket_id', 'employee_id','truck_id', 'crew_id', 'employee_rate', 'ifbill','status', 'isdeleted');
 		foreach($filds as $value){
 			if(isset($data[$value])){
 				$newarr[$value] = $data[$value];

@@ -25,7 +25,7 @@ class Welcome extends CI_Controller {
 		$this->load->model('tool_model');
 		$user = $this->session->userdata('user');
 		if(!$user){
-			$this->tool_model->redirect(BASE_URL().'login/?fromurl='.str_replace('/ci/', '', $_SERVER["REQUEST_URI"]),'Please login.');
+			$this->tool_model->redirect(BASE_URL().'login','Please login.');
 		}
 	}
 

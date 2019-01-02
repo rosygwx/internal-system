@@ -100,7 +100,9 @@
 	
 
 
-	<?php foreach($report as $kri => $vri){?>
+	<?php 
+	foreach($report as $krep => $vrep){
+	foreach($vrep as $kri => $vri){?>
 	<div class="col-lg-12">
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -113,26 +115,29 @@
 							<table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" role="grid" aria-describedby="dataTables-example_info">
 								<thead>
 									<tr role="row">
-										<th class="sorting_asc" width="7%">
+										<th class="sorting_asc" width="6%">
 											Tract
 										</th>
-										<th class="sorting_asc" width="10%">
+										<th class="sorting_asc" width="8%">
 											HWY
 										</th>
-										<th class="sorting_asc" width="7%">
+										<th class="sorting_asc" width="6%">
 											Type
 										</th>
-										<th class="sorting_asc" width="25%">
+										<th class="sorting_asc" width="22%">
 											From
 										</th>
-										<th class="sorting_asc" width="25%">
+										<th class="sorting_asc" width="22%">
 											To
 										</th>
-										<th class="sorting_asc" width="8%">
+										<th class="sorting_asc" width="6%">
 											Mileage
 										</th>
-										<th class="sorting_asc" width="8%">
+										<th class="sorting_asc" width="6%">
 											Cycle
+										</th>
+										<th class="sorting_asc" width="14%">
+											Frequency
 										</th>
 										<th class="sorting_asc" >
 											Comment
@@ -164,6 +169,9 @@
 											<?php echo $vvri['cycle']; ?>
 										</td>
 										<td>
+											<?php echo $vvri['frequency']; ?>
+										</td>
+										<td>
 											<?php echo $vvri['comment']; ?>
 										</td>
 									</tr>
@@ -175,10 +183,7 @@
 										<td>
 											<?php echo number_format($sum[$kri], 2); ?>
 										</td>
-										<td>
-											
-										</td>
-										<td>
+										<td colspan="3" >
 											
 										</td>
 									</tr>
@@ -194,7 +199,7 @@
 
 
 	</div>
-	<?php } ?>
+	<?php }} ?>
 
 	
 

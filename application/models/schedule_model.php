@@ -99,7 +99,7 @@ class Schedule_model extends CI_Model{
 
 
 	public function add($data) {
-		$filds = array('task_id', 'schedule_year', 'schedule_month', 'schedule_week', 'schedule_date', 'btime_req', 'btime', 'etime', 'working_hour', 'traffic_hour', 'billing_hour', 'comment', 'location', 'contact', 'ifschedule', 'travel_hour', 'traffic_control_price', 'disposal_price', 'unit_price', 'pon', 'addtime');
+		$filds = array('task_id', 'schedule_year', 'schedule_month', 'schedule_week', 'schedule_date', 'btime_req', 'btime', 'etime', 'working_hour', 'traffic_hour', 'billing_hour', 'comment', 'location', 'contact', 'ifschedule', 'travel_hour', 'traffic_control_price', 'disposal_price', 'unit_price', 'crew_id', 'pon', 'addtime');
 		foreach($filds as $value){
 			if( isset($data[$value])  ){
 				$newarr[$value] = $data[$value];
@@ -114,7 +114,7 @@ class Schedule_model extends CI_Model{
 	} 
 
 	public function add_batch($data) {
-		$filds = array('task_id', 'schedule_year', 'schedule_month', 'schedule_week', 'schedule_date', 'mindate', 'maxdate', 'unit_price', 'addtime');
+		$filds = array('task_id', 'schedule_year', 'schedule_month', 'schedule_week', 'schedule_date', 'mindate', 'maxdate', 'unit_price', 'crew_id', 'addtime');
 		$newarr = [];
 		$task_id = [];
 		$update_task = [];
@@ -147,7 +147,7 @@ class Schedule_model extends CI_Model{
 	
 	
 	public function update($data,$where){
-		$filds = array('task_id', 'schedule_year', 'schedule_month', 'schedule_week', 'schedule_date', 'date', 'btime_req', 'btime', 'etime', 'working_hour', 'travel_hour', 'billing_hour', 'comment', 'contact', 'location', 'ifschedule', 'traffic_control_price', 'disposal_price', 'unit_price', 'pon', 'status');
+		$filds = array('task_id', 'schedule_year', 'schedule_month', 'schedule_week', 'schedule_date', 'date', 'btime_req', 'btime', 'etime', 'working_hour', 'travel_hour', 'billing_hour', 'comment', 'contact', 'location', 'ifschedule', 'traffic_control_price', 'disposal_price', 'unit_price', 'crew_id', 'pon', 'status');
 		foreach($filds as $value){
 			if(isset($data[$value])){
 				$newarr[$value] = $data[$value];

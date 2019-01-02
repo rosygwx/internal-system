@@ -19,7 +19,7 @@ class Schedule extends CI_Controller {
 		
 		$user = $this->session->userdata('user');
 		if(!$user){
-			$this->tool_model->redirect(BASE_URL().'login/?fromurl='.str_replace('/ci/', '', $_SERVER["REQUEST_URI"]),'Please login.');
+			$this->tool_model->redirect(BASE_URL().'login','Please login.');
 		}
 		
 		$this->load->database();
@@ -32,28 +32,28 @@ class Schedule extends CI_Controller {
 		$this->load->model('company_model');
 		$this->load->model('tool_model');
 
-		$this->schedule_lists_fields = 'SQL_CALC_FOUND_ROWS company.company_name as company,company.phone as phone,company.client_name as client, company.type as company_type, task.hwy_id, task.section_from, task.section_to, task.mile, task.unit_price, schedule.schedule_id, schedule.schedule_year, schedule.schedule_week, schedule.schedule_date, schedule.date, schedule.btime_req, schedule.btime, schedule.etime, schedule.location , schedule.status , schedule.task_id, task_cat.tcat_name, task_cat.tcat_id, task_cat.category, task_cat.index_centerline, contract.poc, contract.pon, contract.contract_id_pannell, contract.contract_id';//join with table company, contract, task, task_cat
+		$this->schedule_lists_fields = 'SQL_CALC_FOUND_ROWS company.company_name as company,company.phone as phone,company.client_name as client, company.type as company_type, task.hwy_id, task.section_from, task.section_to, task.mile, task.unit_price, schedule.schedule_id, schedule.schedule_year, schedule.schedule_week, schedule.schedule_date, schedule.date, schedule.btime_req, schedule.btime, schedule.etime, schedule.location , schedule.status , schedule.task_id, schedule.crew_id, task_cat.tcat_name, task_cat.tcat_id, task_cat.category, task_cat.index_centerline, contract.poc, contract.pon, contract.contract_id_pannell, contract.contract_id';//join with table company, contract, task, task_cat
 
-		$this->schedule_update_fields = 'SQL_CALC_FOUND_ROWS company.type as company_type, contract.contract_id_pannell, schedule.task_id, task.hwy_id, task.section_from, task.section_to, task.mile, task.tract, task_cat.txdot_type, task_cat.index_centerline, schedule.schedule_id, schedule.location, schedule.schedule_date, schedule.date, schedule.btime, schedule.etime, schedule.ifschedule, schedule.status, schedule.comment, schedule.unit_price';
+		$this->schedule_update_fields = 'SQL_CALC_FOUND_ROWS company.type as company_type, contract.contract_id_pannell, schedule.task_id, task.hwy_id, task.section_from, task.section_to, task.mile, task.tract, task_cat.txdot_type, task_cat.tcat_name, task_cat.index_centerline, schedule.schedule_id, schedule.location, schedule.schedule_date, schedule.date, schedule.btime, schedule.etime, schedule.ifschedule, schedule.status, schedule.comment, schedule.unit_price, schedule.crew_id';
 
 		$this->schedule_update_com_fields = 'SQL_CALC_FOUND_ROWS company.type as company_type, contract.contract_id_pannell, contract.cancel_hour,schedule.task_id, schedule.schedule_id, schedule.location, schedule.schedule_date, schedule.date, schedule.btime_req, schedule.btime, schedule.etime, schedule.working_hour, schedule.disposal_price, schedule.traffic_control_price, schedule.travel_hour, schedule.ifschedule, schedule.status, schedule.comment,schedule.contact, schedule.unit_price, schedule.pon';
 
-		$this->schedule_duplicate = 'schedule.task_id, schedule.btime_req, schedule.location, schedule.comment, schedule.pon, schedule.contact, schedule.ifschedule, schedule.disposal_price, schedule.traffic_control_price, case when schedule.ifschedule = 1 then task.unit_price else unit_price_2 end unit_price';
+		$this->schedule_duplicate = 'schedule.task_id, schedule.btime_req, schedule.location, schedule.comment, schedule.pon, schedule.contact, schedule.ifschedule, schedule.disposal_price, schedule.traffic_control_price, case when schedule.ifschedule = 1 then task.unit_price else task.unit_price_2 end unit_price, schedule.travel_hour';
 
 		$this->employee_lists_fields = 'SQL_CALC_FOUND_ROWS employee.employee_id,employee.first_name,employee.last_name,employee.nick_name,employee.rate';
 		$this->truck_lists_fields = 'SQL_CALC_FOUND_ROWS truck.truck_id, truck.number, truck.type';
 		$this->task_lists_fields = 'SQL_CALC_FOUND_ROWS contract.year,contract.bdate,task.task_id,task.cycle';
 		
-		$this->worklog_lists_fields = 'SQL_CALC_FOUND_ROWS worklog.wl_id, worklog.schedule_id, worklog.ticket_id, worklog.employee_id, worklog.truck_id, worklog.contract_id, worklog.schedule_date, worklog.category, employee.nick_name, employee.last_name, truck.number truck_number';
+		$this->worklog_lists_fields = 'SQL_CALC_FOUND_ROWS worklog.wl_id, worklog.schedule_id, worklog.ticket_id, worklog.employee_id, worklog.truck_id, worklog.contract_id, worklog.schedule_date, worklog.category, worklog.crew_id, employee.nick_name, employee.last_name, truck.number truck_number';
 
-		$this->calendar_lists = 'SQL_CALC_FOUND_ROWS company.type, company.company_name, company.company_id, contract.contract_id_pannell, contract.contract_id_ori, task.hwy_id, task.tract, task.cycle, task_cat.tcat_name, task_cat.category, task_cat.index_centerline, schedule.schedule_id, schedule.schedule_year, schedule.schedule_week, schedule.schedule_date, schedule.date, schedule.status, schedule.mindate, schedule.maxdate, task.mile, task.section_from, task.section_to ';
+		$this->calendar_lists = 'SQL_CALC_FOUND_ROWS company.type, company.company_name, company.company_id, contract.contract_id_pannell, contract.contract_id_ori, task.hwy_id, task.tract, task.cycle, task_cat.tcat_name, task_cat.category, task_cat.index_centerline, schedule.schedule_id, schedule.schedule_year, schedule.schedule_week, schedule.schedule_date, schedule.date, schedule.status, schedule.mindate, schedule.maxdate,  task.mile, task.section_from, task.section_to ';
 
 		$this->company_lists = 'SQL_CALC_FOUND_ROWS company.company_name, company.company_id';
 
 		$this->contract_lists = 'SQL_CALC_FOUND_ROWS contract.contract_id, contract.contract_id_ori, contract.contract_id_pannell';
 
-		$this->txdot_print_sch = 'SQL_CALC_FOUND_ROWS schedule.schedule_id, schedule.schedule_date, schedule.btime, schedule.etime, schedule.status, task.task_id, task.section_from, task.section_to, task.hwy_id, task.tract, task_cat.txdot_type type, task_cat.index_centerline, task_cat.category, contract.contract_id_pannell company_name';
-		$this->txdot_print_wl = 'SQL_CALC_FOUND_ROWS worklog.wl_id, worklog.contract_id, worklog.schedule_date, worklog.category, worklog.employee_id, worklog.truck_id';
+		$this->txdot_print_sch = 'SQL_CALC_FOUND_ROWS schedule.schedule_id, schedule.schedule_date, schedule.btime, schedule.etime, schedule.status, worklog.crew_id, task.task_id, task.section_from, task.section_to, task.hwy_id, task.tract, task_cat.txdot_type type, task_cat.index_centerline, task_cat.category, contract.contract_id_pannell company_name';
+		$this->txdot_print_wl = 'SQL_CALC_FOUND_ROWS worklog.wl_id, worklog.contract_id, worklog.schedule_date, worklog.category, worklog.employee_id, worklog.truck_id, worklog.crew_id,';
 
 		$this->ticket_print = 'SQL_CALC_FOUND_ROWS worklog.wl_id, worklog.schedule_id, worklog.ticket_id, concat(employee.nick_name, " ", employee.last_name) employee_name, truck.number truck_number, truck.type truck_type, schedule.schedule_date, schedule.btime_req, schedule.btime, schedule.travel_hour, schedule.location, schedule.comment, schedule.contact, schedule.ifschedule, schedule.traffic_control_price, schedule.disposal_price, schedule.pon, contract.poc, contract.contract_id_pannell company_name';
 
@@ -71,7 +71,7 @@ class Schedule extends CI_Controller {
 	public function lists()
 	{
 		$input = $this->input->get();
-		//var_dump($input['date']);
+		
 		isset($input['company']) && !empty($input['company']) ? $like[] = ['name'=>'contract.contract_id_pannell','value'=>$input['company'] ] : '';
 		isset($input['task_id']) && !empty($input['task_id']) ? $where['schedule.task_id'] = $input['task_id']:'';
 		isset($input['category']) && $input['category'] ? $where['task_cat.category'] = $input['category']:'';
@@ -90,13 +90,10 @@ class Schedule extends CI_Controller {
 		$pagesize_dis = 10;
 
 		$distinct_result = $this->schedule_model->lists('distinct schedule.schedule_date, contract.contract_id, contract.contract_id_pannell, task_cat.category', $where, $like, $json = true, $orderby = ['schedule.schedule_date'=>'desc','contract.contract_id'=>'desc','task_cat.category'=>'asc'], $page_dis, $pagesize_dis, '', 1);
-		//var_dump($distinct_result, $where);
 
 		$where_in = [];
 		if($distinct_result['result']){
 			foreach($distinct_result['result'] as $dis){
-				//$schedule[$dis->schedule_date][$dis->contract_id] = [];
-
 				!in_array($dis->schedule_date, $where_in['schedule.schedule_date']) ? $where_in['schedule.schedule_date'][] = $dis->schedule_date: '';
 				if(!in_array($dis->contract_id, $where_in['contract.contract_id'])){
 					$where_in['contract.contract_id'][] = $dis->contract_id;
@@ -104,14 +101,13 @@ class Schedule extends CI_Controller {
 				}
 				!in_array($dis->category, $where_in['task_cat.category']) ? $where_in['task_cat.category'][] = $dis->category: '';
 			}
-		
-			//var_dump($contract);exit;
+
 			//distince above has set the limitations
 			$page = 1 ;
 			$pagesize = 10000;
 			$where['company.type'] = 1;//txdot
 			
-			$result = $this->schedule_model->lists($this->schedule_lists_fields, $where, $like, $json = true, $orderby = ['schedule_date'=>'desc','schedule_id'=>'desc'], $page, $pagesize,$where_in);
+			$result = $this->schedule_model->lists($this->schedule_lists_fields, $where, $like, $json = true, $orderby = ['schedule.crew_id'=>'asc','schedule_date'=>'desc','schedule_id'=>'desc'], $page, $pagesize,$where_in);
 
 
 			$schedule_id_arr = [];
@@ -127,14 +123,15 @@ class Schedule extends CI_Controller {
 
 
 				//task, version 2
-				$temp_type = $this->txdotTypeConvert($res->tcat_id, 0);
-				//var_dump($temp_type, $res->hwy_id);
-				!in_array($temp_type, $schedule[$res->schedule_date][$res->contract_id][$res->category]['task'][$res->hwy_id]) ? $schedule[$res->schedule_date][$res->contract_id][$res->category]['task'][$res->hwy_id][]= $temp_type : '';
+				//$temp_type = $this->txdotTypeConvert($res->tcat_id, 0);
+				$temp_type = $res->tcat_name;
+
+				!in_array($temp_type, $schedule[$res->schedule_date][$res->contract_id][$res->category]['crew'][$res->crew_id]['task'][$res->hwy_id]) ? $schedule[$res->schedule_date][$res->contract_id][$res->category]['crew'][$res->crew_id]['task'][$res->hwy_id][]= $temp_type : '';
 
 
 
 				//overall actual mile
-				$schedule[$res->schedule_date][$res->contract_id][$res->category]['all_mile'] = $schedule[$res->schedule_date][$res->contract_id][$res->category]['all_mile'] ? $schedule[$res->schedule_date][$res->contract_id][$res->category]['all_mile'] + $res->mile * $res->index_centerline : $res->mile*$res->index_centerline;
+				$schedule[$res->schedule_date][$res->contract_id][$res->category]['crew'][$res->crew_id]['all_mile'] = $schedule[$res->schedule_date][$res->contract_id][$res->category]['crew'][$res->crew_id]['all_mile'] ? $schedule[$res->schedule_date][$res->contract_id][$res->category]['crew'][$res->crew_id]['all_mile'] + $res->mile * $res->index_centerline : $res->mile*$res->index_centerline;
 
 
 				//overall status
@@ -158,23 +155,17 @@ class Schedule extends CI_Controller {
 			$res_worklog = $this->worklog_model->listsTxdot($this->worklog_lists_fields, $where_worklog, '', $json = true, $orderby = '', 1, 100);
 			
 			foreach($res_worklog['result'] as $rw){
-				$schedule[$rw->schedule_date][$rw->contract_id][$rw->category]['employee'][] = $rw->nick_name.' '.$rw->last_name;
-				$schedule[$rw->schedule_date][$rw->contract_id][$rw->category]['truck'][] = $rw->truck_number;
+				$schedule[$rw->schedule_date][$rw->contract_id][$rw->category]['crew'][$rw->crew_id]['employee'][] = $rw->nick_name.' '.$rw->last_name;
+				$schedule[$rw->schedule_date][$rw->contract_id][$rw->category]['crew'][$rw->crew_id]['truck'][] = $rw->truck_number;
 			}
 			//var_dump($where_worklog, $res_worklog['result']);
 		}
 		//search scope
 		$search['company'] = isset($input['company']) && !empty($input['company']) ? $input['company'] : '';
-		//$search['company_type'] = isset($input['company_type']) && !empty($input['company_type']) ? $input['company_type'] : 1;
 		$search['category'] = isset($input['category']) && $input['category'] ? $input['category'] : 0;
-		//$search['status'] = isset($input['status']) && $input['status'] != '' ? (int)$input['status']:'';
 		$search['bdate'] = isset($input['bdate']) && $input['bdate'] != '' ? urldecode($input['bdate']) :date("m/d/Y");
 		$search['edate'] = isset($input['edate']) && $input['edate'] != '' ? urldecode($input['edate']) :date("m/d/Y");
-		//$search['date'] = isset($input['date']) ? $input['date'] : date('m-d-Y');
-		//$search['week'] = isset($input['week']) && !empty($input['week']) ? $input['week'] : '';
-		//$search['year'] = isset($input['year']) && !empty($input['year']) ? $input['year'] : '';
-		//$search['period'] = isset($input['period']) && !empty($input['period']) ? $input['period'] : '';
-		
+
 		//pagination
 		$total = $distinct_result['total'];
 		$url = BASE_URL().'schedule/lists';
@@ -188,7 +179,7 @@ class Schedule extends CI_Controller {
 		$data['page'] = $pageinfo;
 		$data['current'] = $this->current;
 		//echo '<pre>';
-		//var_dump($data['contract']);
+		//var_dump($data['schedule']);
 
 		$this->load->view('schedule/lists',$data);
 	}
@@ -259,7 +250,7 @@ class Schedule extends CI_Controller {
 
 	
 		//echo '<pre>';
-		//var_dump($schedule1);
+		//var_dump($result);
 
 		//worklog
 		$worklog = [];
@@ -464,7 +455,7 @@ class Schedule extends CI_Controller {
 		
 		
 		if($input){
-			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? urldecode($input['backurl']) : 'schedule/lists';
+			$backurl = $_SERVER['HTTP_REFERER'];
 			$schedule_date = isset($input['date']) && !empty($input['date']) ? date('Y-m-d',strtotime(urldecode($input['date']))) : '';
 			$contract_id = isset($input['id']) && !empty($input['id']) ? $input['id'] : '';
 			$category = isset($input['cat']) && !empty($input['cat']) ? $input['cat'] : '';
@@ -473,7 +464,8 @@ class Schedule extends CI_Controller {
 				$where_schedule['schedule.schedule_date'] = $schedule_date;
 				$where_schedule['contract.contract_id'] = $contract_id;
 				$where_schedule['task_cat.category'] = $category;
-				$res_schedule = $this->schedule_model->lists($this->schedule_update_fields, $where_schedule, '' , $json = true, $orderby = '', 1, 500);
+				$orderby_schedule = ['schedule.crew_id'=>'asc', 'task_cat.tcat_id'=>'asc', 'task.tract'=>'asc'];
+				$res_schedule = $this->schedule_model->lists($this->schedule_update_fields, $where_schedule, '' , $json = true, $orderby_schedule, 1, 500);
 				$schedule_row = $res_schedule['result'];
 
 				
@@ -495,10 +487,12 @@ class Schedule extends CI_Controller {
 					$temp['section_to'] = $sc->section_to;
 					$temp['mile'] = sprintf("%.2f",$sc->mile);
 					$temp['tract'] = $sc->tract;
-					$temp['txdot_type'] = $this->txdotTypeConvert($sc->txdot_type);
+					//$temp['txdot_type'] = $this->txdotTypeConvert($sc->txdot_type);
+					$temp['txdot_type'] = $sc->tcat_name;
 					$temp['btime'] = $sc->btime ? date('H:i', strtotime('2018-11-07 '.$sc->btime)) : '';
 					$temp['etime'] = $sc->etime ? date('H:i', strtotime('2018-11-07 '.$sc->etime)) : '';
 					$temp['status'] = $sc->status == 1 ? $sc->date : '';
+					$temp['crew_id'] = $sc->crew_id ?  $sc->crew_id : 1;
 					$mile_all = $mile_all + $sc->mile * $sc->index_centerline;
 
 					$status_all == 1 && $sc->status == 0 ? $status_all = 0 : '';
@@ -514,12 +508,11 @@ class Schedule extends CI_Controller {
 				$where_worklog['worklog.contract_id'] = $contract_id;
 				$where_worklog['worklog.category'] = $category;
 				$res_worklog = $this->worklog_model->listsTxdot($this->worklog_lists_fields, $where_worklog, '', $json = true, $orderby = '', 1, 20);
-				//var_dump($where_worklog,$res_worklog);
 				
 				//driver
 				$employee_where['group_id'] = 4;//driver
 				$employee_where['status'] = 1;//active
-				$res_driver = $this->employee_model->lists($this->employee_lists_fields, $where_driver, '', $json = true, $orderby = ['nick_name'=>'asc'], 1, 500);
+				$res_driver = $this->employee_model->lists($this->employee_lists_fields, $employee_where, '', $json = true, $orderby = ['nick_name'=>'asc'], 1, 500);
 				$driver = [];
 				foreach($res_driver['result'] as $rd){
 					$driver[$rd->employee_id] = $rd->nick_name.' '.$rd->last_name;
@@ -542,6 +535,7 @@ class Schedule extends CI_Controller {
 				$data['taskId'] = $taskId;
 				$data['driver'] = $driver;
 				$data['truck'] = $truck;
+				$data['backurl'] = $backurl;
 				$data['current'] = $this->current;
 				
 				$this->load->view('schedule/update', $data);
@@ -551,9 +545,9 @@ class Schedule extends CI_Controller {
 			}
 		}else{
 			$input = $this->input->post();
-			echo '<pre>';
-			
-			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? urldecode($input['backurl']) : 'schedule/lists';
+			//echo '<pre>';
+			//var_dump($input);
+			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? urldecode($input['backurl']) : $_SERVER['HTTP_REFERER'];
 			$schedule_date = isset($input['schedule_date']) && !empty($input['schedule_date']) ? date('Y-m-d',strtotime(urldecode($input['schedule_date']))) : '';
 			$contract_id = isset($input['contract_id']) && !empty($input['contract_id']) ? $input['contract_id'] : '';
 			$category = isset($input['category']) && !empty($input['category']) ? $input['category'] : '';
@@ -569,8 +563,10 @@ class Schedule extends CI_Controller {
 				$btime_arr = isset($input['btime']) && !empty($input['btime']) ? $input['btime'] : '';
 				$etime_arr = isset($input['etime']) && !empty($input['etime']) ? $input['etime'] : '';
 				$status = isset($input['status']) && !empty($input['status']) ? $input['status'] : '';
+				$crew_id_arr = isset($input['crew_id']) && !empty($input['crew_id']) ? $input['crew_id'] : '';
 				$employee_id_arr = isset($input['employee_id']) && !empty($input['employee_id']) ? $input['employee_id'] : '';
 				$truck_id_arr = isset($input['truck_id']) && !empty($input['truck_id']) ? $input['truck_id'] : '';
+				$crew_wl_id_arr = isset($input['crew_wl_id']) && !empty($input['crew_wl_id']) ? $input['crew_wl_id'] : '';
 				
 
 
@@ -596,8 +592,10 @@ class Schedule extends CI_Controller {
 					$updateSch['btime'] = $btime_arr[$key] ? date('H:i', strtotime('2018-11-07 '.$btime_arr[$key])) : null;
 					$updateSch['etime'] = $etime_arr[$key] ? date('H:i', strtotime('2018-11-07 '.$etime_arr[$key])) : null;
 					
+					$updateSch['crew_id'] = $crew_id_arr[$key] ? $crew_id_arr[$key] : 1 ;
+
 					//var_dump($updateSch, $whereSch);
-					//$res_update = $this->schedule_model->update($updateSch, $whereSch);
+					$res_update = $this->schedule_model->update($updateSch, $whereSch);
 					unset($updateSch, $whereSch);
 				}
 
@@ -613,7 +611,7 @@ class Schedule extends CI_Controller {
 
 				//employee rate
 				if(array_filter($input['employee_id'])){
-					echo 1;
+					//echo 1;
 					$where_rate['employee_id'] = $input['employee_id'] ;
 					$employee = $this->employee_model->lists($this->employee_lists_fields , $where_rate, $like = '', $json = true, $orderby = array('nick_name'=>'asc'), 1, 500);
 					$rate = [];
@@ -622,7 +620,7 @@ class Schedule extends CI_Controller {
 					}
 				}
 
-
+				//var_dump($wl_id_ori, $wl_id, $wl_id_arr);exit;
 				foreach($wl_id_arr as $key => $wl_id){
 					if(in_array($wl_id, $wl_id_ori)){
 						unset($wl_id_ori[array_search($wl_id, $wl_id_ori)]);
@@ -631,9 +629,10 @@ class Schedule extends CI_Controller {
 						$updateWl['employee_id'] = $employee_id_arr[$key] ? $employee_id_arr[$key] : '';
 						$updateWl['employee_rate'] = $employee_id_arr[$key] ? $rate[$employee_id_arr[$key]] : '' ;
 						$updateWl['truck_id'] = $truck_id_arr[$key] ? $truck_id_arr[$key]: '' ;
+						$updateWl['crew_id'] = $crew_wl_id_arr[$key] ? $crew_wl_id_arr[$key]: '' ;
 
-						var_dump($updateWl, $whereWl);
-						//$res = $this->worklog_model->update($updateWl, $whereWl);
+						//var_dump($updateWl, $whereWl);exit;
+						$res = $this->worklog_model->update($updateWl, $whereWl);
 
 						unset($updateWl, $whereWl);
 
@@ -645,9 +644,10 @@ class Schedule extends CI_Controller {
 							$addWl['employee_id'] = $employee_id_arr[$key] ? $employee_id_arr[$key] : '';
 							$addWl['employee_rate'] = $employee_id_arr[$key] ? $rate[$employee_id_arr[$key]] : '' ;
 							$addWl['truck_id'] = $truck_id_arr[$key] ? $truck_id_arr[$key] : '';
+							$addWl['crew_id'] = $crew_wl_id_arr[$key] ? $crew_wl_id_arr[$key] : '';
 
-							var_dump($addWl);
-							//$res = $this->worklog_model->add($addWl);
+							//var_dump($addWl);exit;
+							$res = $this->worklog_model->add($addWl);
 
 							unset($addWl);
 						}
@@ -656,23 +656,23 @@ class Schedule extends CI_Controller {
 					}
 				}
 
-				//delete the worklogs which are deleted from the update page
+				//delete the worklogs from the update page
 				if(array_filter($wl_id_ori)){
 					foreach($wl_id_ori as $wl){
 						$whereWl['wl_id'] = $wl;
 						$deleteWl['isdeleted'] = 1;
 
-						var_dump($deleteWl, $whereWl);
-						//$res = $this->worklog_model->update($deleteWl, $whereWl);
+						//var_dump($deleteWl, $whereWl);
+						$res = $this->worklog_model->update($deleteWl, $whereWl);
 
 						unset($deleteWl, $whereWl);
 					}
 				}
-				exit;
-
+				//exit;
+				$this->tool_model->redirect($backurl, 'Update successfully.');exit;
 			}else{
 				
-				$this->tool_model->redirect(BASE_URL().$backurl, 'Oops, something is missing. Ask technician. Error code #193802');exit;
+				$this->tool_model->redirect($backurl, 'Oops, something is missing. Ask technician. Error code #193802');exit;
 			}
 			
 			
@@ -728,7 +728,7 @@ class Schedule extends CI_Controller {
 			//driver
 			$employee_where['group_id'] = 4;//driver
 			$employee_where['status'] = 1;//active
-			$res_driver = $this->employee_model->lists($this->employee_lists_fields, $where_driver, '', $json = true, $orderby = ['nick_name'=>'asc'], 1, 500);
+			$res_driver = $this->employee_model->lists($this->employee_lists_fields, $employee_where, '', $json = true, $orderby = ['nick_name'=>'asc'], 1, 500);
 			$driver = [];
 			foreach($res_driver['result'] as $rd){
 				$driver[$rd->employee_id] = $rd->nick_name.' '.$rd->last_name;
@@ -763,8 +763,9 @@ class Schedule extends CI_Controller {
 			//echo "<pre>";
 			//var_dump($input);
 			$schedule_id = isset($input['schedule_id']) && !empty($input['schedule_id']) ? $input['schedule_id'] : "" ;
+			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : $_SERVER['HTTP_REFERER'] ;
+
 			if($schedule_id){
-				$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : BASE_URL().'schedule/lists' ;
 				$company_type = isset($input['company_type']) && !empty($input['company_type']) ? $input['company_type'] : 1 ;
 				$wl_id = isset($input['wl_id']) && !empty($input['wl_id']) ? $input['wl_id'] : '' ;
 				$arr['schedule_date'] = isset($input['date']) && !empty($input['date']) ? date("Y-m-d", strtotime(str_replace('-', '/', $input['date']))) : date("Y-m-d");
@@ -803,13 +804,33 @@ class Schedule extends CI_Controller {
 					if($arr['status'] == 2){
 						$arr['working_hour'] = isset($input['cancel_hour']) && !empty($input['cancel_hour']) ? (int)$input['cancel_hour'] : 0;
 					}
-				 
+
+					//ifschedule
+					$weekday = ltrim(date('w', strtotime($arr['schedule_date'])), '0');
+					//$arr['ifschedule'] = $weekday == 6 || $weekday ==0 || ($arr['btime'] > '17:00' && $arr['btime'] < '23:59') || ($arr['btime'] < '07:00' && $arr['btime'] > '00:00') ? 2 : 1;
+
+				}
+				//var_dump($arr,$arr_worklog_add,$arr_worklog_update,$where_worklog_update);exit;
+
+				$res = $this->schedule_model->update($arr, ['schedule_id'=>$schedule_id]);
+				
+				if($res){
+
 					//work_log
 					if(isset($input['employee_id']) && !empty($input['employee_id'])){
 
+						//original worklog
+						$where_worklog['worklog.schedule_id'] = $schedule_id;
+						$res_worklog = $this->worklog_model->listsTxdot('wl_id', $where_worklog, '', $json = true, $orderby = '', 1, 10);
+
+						foreach($res_worklog['result'] as $res){
+							$wl_id_ori[] = $res->wl_id;
+						}
+						//var_dump($wl_id_ori);
+
 						//employee rate
 						if(array_filter($input['employee_id'],'strlen')){
-							echo 1;
+							//echo 1;
 							$where_rate['employee_id'] = $input['employee_id'] ;
 							$employee = $this->employee_model->lists($this->employee_lists_fields , $where_rate, $like = '', $json = true, $orderby = array('nick_name'=>'asc'), 1, 500);
 							$rate = [];
@@ -819,44 +840,42 @@ class Schedule extends CI_Controller {
 						}
 
 						$arr_worklog_add = [];
-						$arr_worklog_udpate = [];
+						$arr_worklog_update = [];
 						
 						foreach($input['ticket_id'] as $ticket_key=>$ticket_id){
 							if($ticket_id || $input['employee_id'][$ticket_key] || $input['truck_id'][$ticket_key]){
+
 								if($wl_id[$ticket_key]){
 									
+									unset($wl_id_ori[array_search($wl_id, $wl_id_ori)]);
+
 									$arr_worklog_update = ['ticket_id'=>$ticket_id , 'employee_id'=>$input['employee_id'][$ticket_key], 'truck_id'=>$input['truck_id'][$ticket_key], 'ifbill'=>1, 'employee_rate'=>$rate[$input['employee_id'][$ticket_key]]];
 
-									$this->worklog_model->update($arr_worklog_update, ['wl_id'=>$wl_id[$ticket_key]]);
+									$resWl = $this->worklog_model->update($arr_worklog_update, ['wl_id'=>$wl_id[$ticket_key]]);
 								}else{
 									$arr_worklog_add[] = ['schedule_id'=>$schedule_id, 'ticket_id'=>$ticket_id , 'employee_id'=>$input['employee_id'][$ticket_key], 'truck_id'=>$input['truck_id'][$ticket_key], 'ifbill'=>1, 'status'=>0, 'employee_rate'=>$rate[$input['employee_id'][$ticket_key]], 'addtime'=>date('Y-m-d H:i:s')];
+
+									$resWl = $this->worklog_model->add_batch($arr_worklog_add);
 								}
+							}
+						}
+						//var_dump($wl_id_ori);exit;
+						//delete the worklogs from the update page
+						if(array_filter($wl_id_ori)){
+							foreach($wl_id_ori as $wl){
+								$whereWl['wl_id'] = $wl;
+								$deleteWl['isdeleted'] = 1;
+
+								//var_dump($deleteWl, $whereWl);
+								$res = $this->worklog_model->update($deleteWl, $whereWl);
+
+								unset($deleteWl, $whereWl);
 							}
 						}
 					}
 
-					//ifschedule
-					$weekday = ltrim(date('w', strtotime($arr['schedule_date'])), '0');
-					//$arr['ifschedule'] = $weekday == 6 || $weekday ==0 || ($arr['btime'] > '17:00' && $arr['btime'] < '23:59') || ($arr['btime'] < '07:00' && $arr['btime'] > '00:00') ? 2 : 1;
+					$this->tool_model->redirect($backurl, "Update successfully.");exit;
 
-				}
-				//var_dump($arr,$arr_worklog_add,$arr_worklog_udpate,$where_worklog_update);exit;
-
-				$res = $this->schedule_model->update($arr, ['schedule_id'=>$schedule_id]);
-				
-				if($res){
-					if($arr_worklog_add){
-						//add work log
-						$res_work_add = $this->worklog_model->add_batch($arr_worklog_add);
-					
-						if($res_work_add){
-							$this->tool_model->redirect($backurl, "Update successfully.");exit;
-						}else{
-							$this->tool_model->redirect($backurl, "Update schedule successfully, but not work log.");exit;
-						}
-					}else{
-						$this->tool_model->redirect($backurl, "Update successfully.");exit;
-					}
 				}else{
 					$this->tool_model->redirect($backurl, "Update schedule and work log unsuccessfully.");exit;
 				}
@@ -877,7 +896,7 @@ class Schedule extends CI_Controller {
 		$schedule_id = isset($input['id']) && !empty($input['id']) ? $input['id'] : '';
 		$date = isset($input['date']) && !empty($input['date']) ? date('Y-m-d', strtotime($input['date'])) : '';
 		$btime_req = isset($input['btime_req']) && !empty($input['btime_req']) ? $input['btime_req'] : '';
-		$backurl = isset($input['backurl']) && !empty($input['backurl']) ? urldecode($input['backurl']) : 'schedule/listsCom';
+		$backurl = isset($input['backurl']) && !empty($input['backurl']) ? urldecode($input['backurl']) : $_SERVER['HTTP_REFERER'] ;
 		//var_dump($input);exit;
 		if($schedule_id && $date){
 			$where_schedule['schedule_id'] = $schedule_id;
@@ -899,20 +918,21 @@ class Schedule extends CI_Controller {
 				$addSch['disposal_price'] = $res_schedule->disposal_price;
 				$addSch['traffic_control_price'] = $res_schedule->traffic_control_price;
 				$addSch['unit_price'] = $res_schedule->unit_price;
+				$addSch['travel_hour'] = $res_schedule->travel_hour;
 				$addSch['addtime'] = date('Y-m-d H:i:s');
 
 				$res_add = $this->schedule_model->add($addSch);
 
 				if($res_add){
-					$this->tool_model->redirect(BASE_URL().$backurl, 'New schedule has been created!');
+					$this->tool_model->redirect($backurl, 'New schedule has been created!');
 				}else{
-					$this->tool_model->redirect(BASE_URL().$backurl, 'Oops, something is missing. Ask technician. Error code #193803.');
+					$this->tool_model->redirect($backurl, 'Oops, something is missing. Ask technician. Error code #193803.');
 				}
 			}else{
-				$this->tool_model->redirect(BASE_URL().$backurl, 'Oops, something is missing. Ask technician. Error code #193802.');
+				$this->tool_model->redirect($backurl, 'Oops, something is missing. Ask technician. Error code #193802.');
 			}
 		}else{
-			$this->tool_model->redirect(BASE_URL().$backurl, 'Oops, something is missing. Ask technician. Error code #193801.');
+			$this->tool_model->redirect($backurl, 'Oops, something is missing. Ask technician. Error code #193801.');
 		}
 	}
 
@@ -927,7 +947,7 @@ class Schedule extends CI_Controller {
 		$schedule_id = isset($input['id']) && !empty($input['id']) ? $input['id'] : '';
 		
 		if($schedule_id){
-			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : '/schedule/lists/?date=&unschedule=1';
+			$backurl = isset($input['backurl']) && !empty($input['backurl']) ? $input['backurl'] : $_SERVER['HTTP_REFERER'] ;
 			$status = isset($input['status']) && $input['status'] != '' ? $input['status'] : 1;
 			isset($input['date']) && !empty($input['date']) ? $this->db->set('date', date("Y-m-d", strtotime($input['date']))) : $this->db->set('date', 'schedule_date', FALSE);;
 
@@ -1605,8 +1625,8 @@ class Schedule extends CI_Controller {
 					$tic->ifDisposal = $tic->disposal_price != null &&  $tic->disposal_price != 0 ? 1 : 0;
 					$tic->schedule_date = date('m/d/Y', strtotime($tic->schedule_date));
 					$tic->btime_req = $tic->btime_req ? date('h:i a', strtotime(date('Y-m-d').' '.$tic->btime_req)) : date('h:i a', strtotime(date('Y-m-d').' '.$tic->btime)) ;
-					$tic->btime = date('h:i a', strtotime(date('Y-m-d').' '.$tic->btime));
-					$tic->etime = date('h:i a', strtotime(date('Y-m-d').' '.$tic->etime));
+					$tic->btime = $tic->btime ? date('h:i a', strtotime(date('Y-m-d').' '.$tic->btime)) : '';
+					$tic->etime = $tic->etime ? date('h:i a', strtotime(date('Y-m-d').' '.$tic->etime)) : '';
 					$tic->ifWeekend = in_array(date('N', strtotime($tic->schedule_date)), [6,7]) ? 1: 0;
 					//var_dump($tic->schedule_date);
 					//truck type check box
@@ -1683,6 +1703,19 @@ class Schedule extends CI_Controller {
 
 							$tic->comment1 = substr($tic->comment, 0, $curLength);
 							$tic->comment2 = substr($tic->comment, $curLength);
+
+							if(strlen($tic->comment2) > $length){
+								for($i = $length; $i > 0; $i --){
+									if(substr($tic->comment2, $i-1, 1) == ' '){
+										$curLength = $i; break;
+									}
+								}
+
+								$tic->comment22 = substr($tic->comment2, 0, $curLength);
+								$tic->comment3 = substr($tic->comment2, $curLength);
+								$tic->comment2 = $tic->comment22;
+
+							}
 						}else{
 							$tic->comment1 = $tic->comment;
 							$tic->comment2 = '';

@@ -98,7 +98,7 @@
           </div> -->
 
           <form role="form" action="<?php echo BASE_URL();?>login/login_do" method='post' style="padding-top:50px;">
-            <input type="hidden" name="fromurl" value="<?php echo $fromurl; ?>">
+            <input type="hidden" name="fromurl" value="<?php echo isset($fromurl) && !empty($fromurl) ? $fromurl : $_SERVER['HTTP_REFERER']; ?>">
             <div class="form-group">
               <label for="inputUsernameEmail">Username</label>
               <input type="text" class="form-control" name="username" required>
