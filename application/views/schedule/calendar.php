@@ -107,6 +107,7 @@
 			          $('#tcat_name').val(event.tcat_name);
 			          $('#tract').val(event.tract);
 			          $('#cycle').val(event.cycle);
+			          $('#frequency').val(event.frequency);
 			          $('#section_from').val(event.section_from);
 			          $('#section_to').val(event.section_to);
 			          $('#btime').val(event.btime);
@@ -117,7 +118,7 @@
 			          }else{
 			          	$('#status').attr("checked",false);
 			          }
-
+			          $('#order').val(event.order);
 			          console.log(event.status);
 			          
 			          /*$('#start_date').val(moment(event.start).format('YYYY/MM/DD HH:mm'));
@@ -247,10 +248,16 @@
 		                    <input type="text" class="form-control" name="section_to" id="section_to" readonly>
 		                </div>
 		        </div>
-		        <div class="form-group">
+		       <!--  <div class="form-group">
 		                <label for="p-in" class="col-md-4 label-heading">Cycle</label>
 		                <div class="col-md-8">
 		                    <input type="text" class="form-control" name="cycle" id="cycle" readonly>
+		                </div>
+		        </div> -->
+		        <div class="form-group">
+		                <label for="p-in" class="col-md-4 label-heading">Frequency</label>
+		                <div class="col-md-8">
+		                    <input type="text" class="form-control" name="frequency" id="frequency" readonly>
 		                </div>
 		        </div>
 		        <div class="form-group">
@@ -272,6 +279,7 @@
 		                    </div>
 		            </div> -->
 		            <input type="hidden" name="event_id" id="event_id" value="0" />
+		            <input type="hidden" name="order" id="order" value="0" />
 		      </div>
 		      <div class="modal-footer">
 		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

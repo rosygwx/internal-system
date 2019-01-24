@@ -14,7 +14,7 @@ class Task_model extends CI_Model{
 	}
 
 
-	public function lists( $fields = '*' , $where = '', $like = '', $json = true, $orderby = array('id'=>'desc'), $page = 1, $pagesize = 500 ){
+	public function lists( $fields = '*' , $where = '', $like = '', $json = true, $orderby = array('id'=>'desc'), $page = 1, $pagesize = 500, $ifExtra = '', $whereExtra = '' ){
 		if( is_array( $fields ) ) {
 			$fld = implode( ',' , $fields );
 		}else
@@ -49,6 +49,16 @@ class Task_model extends CI_Model{
 		$this->db->join('contract','task.contract_id = contract.contract_id');
 		$this->db->join('company','company.company_id = contract.company_id');
 		$this->db->join('task_cat','task_cat.tcat_id = task.tcat_id');
+		//$ifExtra == 1 ? $this->db->join('(select schedule_id, task_id, unit, unit_price from schedule where schedule_date = "'.$whereExtra['schedule_date'].'") schedule ', 'schedule.task_id = task.task_id', 'left') : '';
+
+		//txdot extra task on schedule update page
+		if($ifExtra == 1){
+
+			$this->db->join('(select task_id, sum( case when unit = 0 or unit is null then 0 else unit end ) unitSum from schedule where isdeleted = 0 group by task_id) schedule ', 'schedule.task_id = task.task_id', 'left') ;
+
+			$this->db->join('(select schedule_id, task_id, unit from schedule where schedule_date = "'.$whereExtra['schedule_date'].'" and isdeleted = 0 ) schedule2 ', 'schedule2.task_id = task.task_id', 'left') ;
+		}
+
 
 		if ( is_array($orderby) ){
 			foreach($orderby as $order => $sort){
@@ -64,10 +74,13 @@ class Task_model extends CI_Model{
 		if($json)
 			$result = $query->result();
 		else
-			$result = $query->reuslt_array();
+			$result = $query->result_array();
 
 		return array( 'result' => $result , 'total' => $total->row()->count );
 	}
+
+
+
 
 
 	public function add($data) {
@@ -184,7 +197,7 @@ class Task_model extends CI_Model{
 	            $result['msg'] = "wrong cycle number  (".$curCycle.")";//cycle not right
 	            $result['cycle'] = $curCycle;
 	            //return $result;exit;
-	            var_dump($result);
+	            //var_dump($result);
 			}
 		}
 

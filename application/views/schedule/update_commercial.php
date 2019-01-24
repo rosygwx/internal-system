@@ -26,24 +26,24 @@
 			float: left;
 		}
 
-		  .custom-combobox {
-		    position: relative;
-		    display: inline-block;
-		  }
-		  .custom-combobox-toggle {
-		    position: absolute;
-		    top: 0;
-		    bottom: 0;
-		    margin-left: -1px;
-		    padding: 0;
-		    right:13px;
+	  .custom-combobox {
+	    position: relative;
+	    display: inline-block;
+	  }
+	  .custom-combobox-toggle {
+	    position: absolute;
+	    top: 0;
+	    bottom: 0;
+	    margin-left: -1px;
+	    padding: 0;
+	    right:13px;
 
-		  }
-		  .custom-combobox-input {
-		    margin: 0;
-		    padding: 1.0em;
-		    background-color: white;
-		  }
+	  }
+	  .custom-combobox-input {
+	    margin: 0;
+	    padding: 1.0em;
+	    background-color: white;
+	  }
 	</style>
 
 	<script>
@@ -69,20 +69,20 @@
        		//$('.datetimepicker').val(scheduleDate);
        		
        		$('.datetimepicker_start_req').datetimepicker({
-            	format:'HH:mm',
+            	format:'hh:mm a',
             	useCurrent: false
             });
 
         	
             $('.datetimepicker_start').datetimepicker({
-            	format:'HH:mm',
+            	format:'hh:mm a',
             	useCurrent: false
             });
         
         
         
             $('.datetimepicker_end').datetimepicker({
-            	format:'HH:mm',
+            	format:'hh:mm a',
             	useCurrent: false
             });
         
@@ -331,6 +331,8 @@
 				<input type='hidden' name='backurl'  id='backurl' value='<?=$_SERVER['HTTP_REFERER']?>' ></input>
 				<input type='hidden' name='schedule_id'  id='schedule_id' value='<?php echo $schedule->schedule_id?>' ></input>
 				<input type='hidden' name='company_type'  id='company_type' value='2' ></input>
+				<input type='hidden' name='unit_price'  id='unit_price' value='<?php echo $task[0]->unit_price?>' ></input>
+				<input type='hidden' name='unit_price_2'  id='unit_price_2' value='<?php echo $task[0]->unit_price_2?>' ></input>
 				
 		    	<div class="form-group">
 					<label class="col-md-2 control-label"><i>*</i>Contract Name:</label>

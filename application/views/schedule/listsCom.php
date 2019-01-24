@@ -24,12 +24,12 @@
             });
 
             $('.datetimepicker_start').datetimepicker({
-            	format:'HH:mm',
+            	format:'hh:mm a',
             	
             });
         
             $('.datetimepicker_end').datetimepicker({
-            	format:'HH:mm'
+            	format:'hh:mm a'
             });
 
             $('.datetimepicker_start_search').datetimepicker({
@@ -273,8 +273,8 @@
 			            <div class="modal-body" style="margin-top: 10px;"> 
 		                    <input class="form-control" type="hidden" id="id" name="id" placeholder="Shcedule ID..." value="">
 
-		                    <input type='hidden' name='backurl'  id='backurl' value='<?php echo urlencode(trim($_SERVER['PATH_INFO'].'?'.$_SERVER['QUERY_STRING'], '/'))?>' ></input>
-
+		                   <!--  <input type='hidden' name='backurl'  id='backurl' value='<?php echo urlencode(trim($_SERVER['PATH_INFO'].'?'.$_SERVER['QUERY_STRING'], '/'))?>' ></input>
+ -->
 
 		                    <div class="form-group">
 		                        <label class="col-md-3">Contract Name</label>
@@ -327,7 +327,7 @@
 									</div>
 				                </div> 
 							</div> -->
-		                    <input type='hidden' name='backurl'  id='backurl' value='<?php echo urlencode(trim($_SERVER['PATH_INFO'].'?'.$_SERVER['QUERY_STRING'], '/'))?>' ></input>
+		                   <!--  <input type='hidden' name='backurl'  id='backurl' value='<?php echo urlencode(trim($_SERVER['PATH_INFO'].'?'.$_SERVER['QUERY_STRING'], '/'))?>' ></input> -->
 			            	
 			        	</div>
 
@@ -461,9 +461,9 @@
 				<?php }?>
 					<td class="text-left"><input name="checkall[]" type="checkbox" value="<?=$v->schedule_id?>"></td>	
 					<td><?php echo $v->schedule_period;?></td>
-					<td><?php if($v->btime_req)echo date('H:iA', strtotime($v->btime_req));else echo '-';?></td>
-					<td><?php if($v->btime)echo date('H:iA', strtotime($v->btime));else echo '-';?></td>
-					<td><?php if($v->etime)echo date('H:iA', strtotime($v->etime));else echo '-';?></td>							
+					<td><?php if($v->btime_req)echo date('h:iA', strtotime($v->btime_req));else echo '-';?></td>
+					<td><?php if($v->btime)echo date('h:iA', strtotime($v->btime));else echo '-';?></td>
+					<td><?php if($v->etime)echo date('h:iA', strtotime($v->etime));else echo '-';?></td>							
 					<td><?php echo $v->contract_id_pannell?></td>					
 					<td><?php echo $v->location?></td>
 					<td style="width:6%"><?php if($worklog[$v->schedule_id]){
@@ -529,7 +529,7 @@
 						
 						<!-- <a class="complete" scid="<?php echo $v->schedule_id?>" status="<?php echo $v->status?>"  href="javascript:void(0)"> <?php if($v->status == 0)echo 'Complete';else echo 'Incomplete';?></a>  -->
 
-						<a class="open-AddDialog " data-toggle="modal"  data-id="<?php echo $v->schedule_id;?>" data-employee="<?php echo $v->employeejs;?>" data-btime="<?php echo date('H:i',strtotime($v->btime));?>" data-date="<?php echo $v->date;?>" data-contract="<?php echo $v->contract_id_pannell;?>" data-location="<?php echo $v->location;?>" data-location="<?php echo $v->location;?>" href="#addDialog">Duplicate</a>
+						<a class="open-AddDialog " data-toggle="modal"  data-id="<?php echo $v->schedule_id;?>" data-employee="<?php echo $v->employeejs;?>" data-btime="<?php echo date('H:i a',strtotime($v->btime));?>" data-date="<?php echo $v->date;?>" data-contract="<?php echo $v->contract_id_pannell;?>" data-location="<?php echo $v->location;?>" data-location="<?php echo $v->location;?>" href="#addDialog">Duplicate</a>
 
 						&nbsp
 						

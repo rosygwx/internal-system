@@ -32,10 +32,10 @@ class Contract extends CI_Controller {
 		$this->contract_lists_fields_hour = 'SQL_CALC_FOUND_ROWS company.company_name as company,company.phone as phone,contract.sign_date as signdate,contract.status as status, contract.contract_id_pannell,contract.contract_id, contract.addtime as addtime, contract.bdate as bdate, contract.quote_real, avg(task.unit_price) unit_price, task.unit_price_2, task.traffic_control_price, task.disposal_price, contract.travel_hour, contract.cancel_hour';
 
 		$this->contract_update_fields = 'company.company_name,contract.contract_id, contract.contract_id_pannell, contract.poc, contract.pon, contract.office, task.unit_price, task.unit_price_2, task.traffic_control_price, task.disposal_price, task.task_id, contract.travel_hour , contract.cancel_hour, contract.sign_date';
-		$this->contract_update_fields_txdot = 'company.company_name, contract.contract_id, contract.contract_id_pannell,  contract.contract_id_ori, contract.quote_real, contract.company_id, contract.sign_date, contract.bdate, contract.year,  contract.office';
+		$this->contract_update_fields_txdot = 'company.company_name, contract.contract_id, contract.contract_id_pannell,  contract.contract_id_ori, contract.quote_real, contract.company_id, contract.sign_date, contract.bdate, contract.year,  contract.office, contract.status';
 		$this->company_fields = 'company_id, company_name, type';
 		$this->task_category_fields = 'tcat_id, category, tcat_name';
-		$this->bill_fields = 'schedule.schedule_id, schedule.comment, schedule.date, schedule.btime, schedule.etime, task.tcat_id, task.tract, task.hwy_id, task.section_from, task.section_to, task.unit_price, task.mile,  task.cycle, contract.contract_id_pannell, task_cat.category, task_cat.tcat_name type, task_cat.index_centerline, task.frequency , company.type company_type';
+		$this->bill_fields = 'schedule.schedule_id, schedule.comment, schedule.date, schedule.btime, schedule.etime, schedule.schedule_week, task.task_id, task.tcat_id, task.tract, task.hwy_id, task.section_from, task.section_to, task.unit_price * schedule.unit price, task.mile,  task.cycle, contract.contract_id_pannell, task_cat.category, task_cat.tcat_name type, task_cat.index_centerline, task.frequency , company.type company_type';
 
 		$this->current = 'contract';//nevigation
 		$this->currentRev = 'revenue';//nevigation
@@ -364,6 +364,7 @@ class Contract extends CI_Controller {
 				$dataCtr['sign_date'] = isset($input['sign_date']) && !empty($input['sign_date']) ? date('Y-m-d', strtotime($input['sign_date'])) : '';
 				$dataCtr['bdate'] = isset($input['bdate']) && !empty($input['bdate']) ? date('Y-m-d', strtotime($input['bdate'])) : '';
 				$dataCtr['year'] = isset($input['year']) && !empty($input['year']) ? $input['year'] : '';
+				$dataCtr['status'] = isset($input['status']) && $input['status'] != 0 ? $input['status'] : '';
 
 				$resCtr = $this->contract_model->update($dataCtr, $whereCtr, 1);
 
@@ -465,10 +466,11 @@ class Contract extends CI_Controller {
 	public function revenue(){
 		$input = $this->input->get();
 		$company_type = isset($input['company_type']) && !empty($input['company_type']) ? $input['company_type'] : 1;//1:txdot, 2:commercial
-
+		$statusContract = isset($input['status']) && $input['status'] != '' ? $input['status'] : '';
 
 		if($company_type ==1 ){//txdot
-			$res = $this->contract_model->revenue();
+			
+			$res = $this->contract_model->revenue($statusContract);
 
 
 			$sumQuoteReal = 0;
@@ -511,6 +513,7 @@ class Contract extends CI_Controller {
 
 		//search variables
 		$search['company_type'] = $company_type;
+		$search['status'] = $statusContract;
 
 		$data['revenue'] = $res;
 		$data['company_type'] = $company_type;
@@ -518,7 +521,7 @@ class Contract extends CI_Controller {
 		$data['sum_cur'] = $sum_cur;
 		$data['search'] = $search;
 		$data['current'] = "revenue";
-		//var_dump($res);
+		
 		$this->load->view('contract/revenue',$data);
 	}
 
@@ -545,37 +548,102 @@ class Contract extends CI_Controller {
 			$where_bill['task.contract_id'] = $contract_id;
 			$bdate = isset($input['bdate']) && !empty($input['bdate']) ? date('Y-m-d', strtotime($input['bdate'])) : date('Y-m-d');
 			$edate = isset($input['edate']) && !empty($input['edate']) ? date('Y-m-d', strtotime($input['edate'])) : date('Y-m-d');
+
+			$category = isset($input['category']) && !empty($input['category']) ? $input['category'] : '';
 			
 			$where_bill['schedule.date >='] = $bdate; 
 			$where_bill['schedule.date <='] = $edate; 
+			$category ? $where_bill['task_cat.category'] = $category : ''; 
 			
-			$res_bill = $this->contract_model->bill($this->bill_fields, $where_bill, $like = "", $json = true, $orderby = "", 1, 2000);
-			//var_dump($res_bill);
+			$res_bill = $this->contract_model->bill($this->bill_fields, $where_bill, $like = "", $json = true, $orderby = ['schedule.schedule_id'=>'asc'], 1, 2000);
+			//var_dump($category);
 			$bill = [];
 			$task_cat = [];
 			$sum = [];
 			$sum[0] = 0;
+			$week = [];
 			foreach($res_bill['result'] as $res){
-				$bill[$res->tcat_id][] = ['tract' => $res->tract, 'schedule_id' => $res->schedule_id, 'hwy_id' => $res->hwy_id, 'section_to' => $res->section_to, 'section_from'=>$res->section_from, 'amount' => $res->unit_price, 'type' => $res->type, 'date'=>date('m/d/Y',strtotime($res->date))] ;
-				$sum[$res->tcat_id] += $res->unit_price;
-				$sum[0] += $res->unit_price;
+				$resTemp['tract'] = $res->tract ? $res->tract : '-';
+				$resTemp['hwy_id'] = $res->hwy_id ? $res->hwy_id : '-';
+				$resTemp['section_to'] = $res->section_to ? $res->section_to : '-';
+				$resTemp['section_from'] = $res->section_from ? $res->section_from : '-';
+				$resTemp['schedule_week'] = $res->schedule_week ? $res->schedule_week : '';
+				$resTemp['frequency'] = $res->frequency ? $res->frequency : '-';
+				$resTemp['price'] = $res->price ? $res->price : '0.00';
+				$resTemp['type'] = $res->type ? $res->type : '';
+				$resTemp['date'] = $res->date ? date('m/d/Y',strtotime($res->date)) : '';
+				$resTemp['tcat_id'] = !in_array($res->category, [3, 4]) ? $res->tcat_id : 99999;
+
+
+
+				if(!$bill[$resTemp['tcat_id']][$res->task_id]){//eg: $bill[1][1324]
+
+					$billTemp = ['tract' => $resTemp['tract'], 'schedule_id' => $res->schedule_id, 'hwy_id' => $resTemp['hwy_id'], 'section_to' => $resTemp['section_to'], 'section_from'=>$resTemp['section_from'], 'frequency'=>$resTemp['frequency'], 'type' => $resTemp['type'], 'price' => $resTemp['price'], 'date'=>[$resTemp['schedule_week'] => [$resTemp['date']] ] ];
+
+					$bill[$resTemp['tcat_id']][$res->task_id] =  $billTemp;
+					//var_dump($bill);exit;
+				}else{
+					$bill[$resTemp['tcat_id']][$res->task_id]['price'] += $resTemp['price'];
+					$bill[$resTemp['tcat_id']][$res->task_id]['date'][$resTemp['schedule_week']][] = $resTemp['date'];
+				}
+
+				$sum[$res->tcat_id]['price'] += $resTemp['price'];
+
+
+				//week
+				!in_array($resTemp['schedule_week'], $week) ? $week[] = $resTemp['schedule_week'] : '';
+				//
+				
+				!in_array($res->category, [3, 4]) ? $sum[0] += $res->price : '';
+
+
+				/*$billTemp = ['tract' => $resTemp['tract'], 'schedule_id' => $res->schedule_id, 'hwy_id' => $resTemp['hwy_id'], 'section_to' => $resTemp['section_to'], 'section_from'=>$resTemp['section_from'], 'price' => $resTemp['price'], 'type' => $resTemp['type'], 'date'=>$resTemp['date']];
+
+				if(!in_array($res->category, [3, 4])){
+					$bill[$res->tcat_id][] =  $billTemp;
+					$sum[$res->tcat_id] += $resTemp['price'];
+					$sum[0] += $res->price;
+				}else{
+					$bill[99999][] = $billTemp; //task extra
+					$sum[99999] += $resTemp['price'];
+				} */
+ 
+				unset($billTemp, $resTemp);
+				
 				if(!in_array($res->tcat_id, $task_cat)){
-					$category = $res->category == 1 ? "Debris" : "Sweeping" ;
-					$task_cat[$res->tcat_id] = ['type' => $res->type, 'category' => $category];
-				}  
+					switch ($res->category) {
+						case 1:
+							$categoryTemp = "Debris";
+							break;
+						case 2:
+							$categoryTemp = "Sweeping";
+							break;
+						default:
+							$categoryTemp = "Extra";
+							break;
+					}
+					
+					$task_cat[$res->tcat_id] = ['type' => $res->type, 'category' => $categoryTemp];
+
+					unset($categoryTemp);
+				}
+
+				// 
 			}
 			ksort($bill);
+			
 
 			//selected contract
 			$contractCur = ['name' => $contract[$contract_id]['contract_id_pannell'], 'id' => $contract_id ,'ori_id' => $contract[$contract_id]['contract_id_ori']];
 
-			//projected amount
+			//projected amount & extra amount 
 			$where_bill_pro['task.contract_id'] = $contract_id;
 			$where_bill_pro['schedule.ori_date >='] = $bdate; 
 			$where_bill_pro['schedule.ori_date <='] = $edate; 
-			$res_bill_pro = $this->contract_model->bill('sum(task.unit_price) as sum', $where_bill_pro, $like = "", $json = true, $orderby = "", 1, 2000);
-			$sum_pro = $res_bill_pro['result'][0]->sum;
-			
+			$res_bill_pro = $this->contract_model->bill('sum(case when task_cat.category <> 4 then task.unit_price * schedule.unit else 0 end) sumpro, sum(case when task_cat.category = 4 then task.unit_price * schedule.unit else 0 end) sumextra', $where_bill_pro, $like = "", $json = true, $orderby = "", 1, 2000);
+			$sum_pro = $res_bill_pro['result'][0]->sumpro;
+			$sum_extra = $res_bill_pro['result'][0]->sumextra;
+			//var_dump($category);
 
 			$data['bill'] = $bill;
 			$data['task_cat'] = $task_cat;
@@ -583,12 +651,15 @@ class Contract extends CI_Controller {
 			$data['contract_id'] = $contract_id;
 			$data['sum'] = $sum;
 			$data['sum_pro'] = $sum_pro;
+			$data['sum_extra'] = $sum_extra;
+			$data['week'] = $week;
 			$data['bdate'] = date('m/d/Y', strtotime($bdate));
 			$data['edate'] = date('m/d/Y', strtotime($edate));
+			$data['category'] = $category;
 			$data['current'] = $this->currentRep;
 			
 			//var_dump($bill[7], $sum, $data['date'] );
-			
+			//var_dump($data['sum']);
 
 		}
 
@@ -616,12 +687,14 @@ class Contract extends CI_Controller {
 		if($contract_id){
 			//report
 			$where_report['task.contract_id'] = $contract_id;
-			$date = $where_report['schedule.date'] = isset($input['date']) && !empty($input['date']) ? date('Y-m-d', strtotime(urldecode($input['date']))) : date('Y-m-d');
+			$date = $where_report['schedule.schedule_date'] = isset($input['date']) && !empty($input['date']) ? date('Y-m-d', strtotime(urldecode($input['date']))) : date('Y-m-d');
+			$category = isset($input['category']) && !empty($input['category']) ? $input['category'] : '';
+			$where_report['task_cat.category'] = $category ?  $category : [1,2];//default by 1(Debris) and 2(Sweeping)
 			$ifPrint = isset($input['ifPrint']) && !empty($input['ifPrint']) ? $input['ifPrint'] : 0;
 			
 			$res_report = $this->contract_model->bill($this->bill_fields, $where_report, $like = "", $json = true, $orderby = ['task.tcat_id'=>'asc']);
 
-			//var_dump($where_report, $res_report);
+			//var_dump($category);
 
 			if($res_report['result']){
 				
@@ -634,27 +707,43 @@ class Contract extends CI_Controller {
 				foreach($res_report['result'] as $res){
 					$schedule_id_arr[] = $res->schedule_id;
 
-					$btime = $res->btime ? date('H:i a', strtotime($res->btime)) : '';
-					$etime = $res->etime ? date('H:i a', strtotime($res->etime)) : '';
+					if($res->btime){
+						$btime = date('H:i a', strtotime($res->btime));
 
-					$report[$res->category][$res->tcat_id][] = ['tract' => $res->tract, 'schedule_id' => $res->schedule_id, 'hwy_id' => $res->hwy_id, 'to' => $res->section_to, 'from' => $res->section_from, 'amount' => number_format($res->unit_price, 2), 'type' => $res->type, 'mile' => number_format($res->mile, 2), 'cycle' => $res->cycle , 'comment'=> $btime.'-'.$etime , 'frequency' => $res->frequency ] ;
+						$btimeWithDate = $res->category == 2 && $btime > '12:00:00' ?  strtotime($date.' '.$res->btime) : strtotime('+ 1 day',strtotime( $date.' '.$res->btime)) ;
+						
+						(!$time[$res->category]['from'] || $btimeWithDate < $time[$res->category]['from']) ? $time[$res->category]['from'] = $btimeWithDate : '';
+					}else{
+						$btime = '';
+					}
+
+					if($res->etime){
+						$etime = date('H:i a', strtotime($res->etime));
+
+						$etimeWithDate = $res->category == 2 && $etime > '12:00:00' ?  strtotime($date.' '.$res->etime) : strtotime('+ 1 day',strtotime(  $date.' '.$res->etime)) ;
+
+						(!$time[$res->category]['to'] || $etimeWithDate > $time[$res->category]['to']) ? $time[$res->category]['to'] = $etimeWithDate : '';
+					}else{
+						$etime = '';
+					}
+
+					$curdate = $res->date != '0000-00-00' && isset($res->date) ? date('m/d/Y', strtotime($res->date)) : '-';
+
+					$report[$res->category][$res->tcat_id][] = ['tract' => $res->tract, 'schedule_id' => $res->schedule_id, 'hwy_id' => $res->hwy_id, 'to' => $res->section_to, 'from' => $res->section_from, 'amount' => number_format($res->unit_price, 2), 'type' => $res->type, 'mile' => number_format($res->mile, 2), 'cycle' => $res->cycle , 'comment'=> $btime.'-'.$etime , 'frequency' => $res->frequency, 'date' => $curdate] ;
 					
 					//$sum[$res->tcat_id] += $res->unit_price;
 					//$sum[0] += $res->unit_price;
 					$sum[$res->tcat_id] += $res->mile * $res->index_centerline;
 					$sum[0] += $res->mile * $res->index_centerline;
 					if(!in_array($res->tcat_id, $task_cat)){
-						$category = $res->category == 1 ? "Debris" : "Sweeping" ;
-						$task_cat[$res->tcat_id] = ['type' => $res->type, 'category' => $category];
+						$categoryTemp = $res->category == 1 ? "Debris" : "Sweeping" ;
+						$task_cat[$res->tcat_id] = ['type' => $res->type, 'category' => $categoryTemp];
 					}  
 
-					
-					$res->btime && (!$time[$res->category]['from'] || $res->btime < $time[$res->category]['from']) ? $time[$res->category]['from'] = $btime : '';
-					$res->etime && (!$time[$res->category]['to'] || $res->etime > $time[$res->category]['to']) ? $time[$res->category]['to'] = $etime : '';
-
-					unset($btime, $etime);
+					unset($btime, $etime, $curdate, $categoryTemp);
 				}
-				
+				//var_dump($time);
+
 				//worklog
 				$whereWl['worklog.contract_id'] = $contract_id;
 				$whereWl['worklog.schedule_date'] = $date;
@@ -713,6 +802,7 @@ class Contract extends CI_Controller {
 			$data['contract'] = $contract;
 			$data['contractCur'] = $contractCur;
 			$data['date'] = date('m/d/Y', strtotime($date));
+			$data['category'] = $category;
 			
 		}
 
@@ -720,7 +810,7 @@ class Contract extends CI_Controller {
 		$data['current'] = $this->currentRep;
 		$data['contractAll'] = $contract;
 		//echo '<pre>';
-		//var_dump($data['report']);
+		//var_dump($data['category']);
 		//var_dump($bill[7], $sum, $data['date'] );
 		if($ifPrint==0){
 			$this->load->view("contract/dailyReport",$data);

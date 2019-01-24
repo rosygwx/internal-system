@@ -320,7 +320,15 @@
 				<option value='1' <?php if($search['company_type'] == 1 ){echo 'selected';}?>>TxDOT</option>
 				<option value='2' <?php if($search['company_type'] == 2){echo 'selected';}?>>Commercial</option>
 			</select>
-		</div> -->	
+		</div> -->
+		<div class="form-group" style="position:relative">
+			<select name='contract_id' class="form-control">
+				<option value='' <?php if($search['contract_id'] == '' ){echo "selected";}?>> Select Contract </option>
+				<?php foreach($contract as $ckey=>$cname){?>
+				<option value=<?php echo $ckey;?> <?php if($search['contract_id'] == $ckey ){echo "selected";}?>> <?php echo $cname;?> </option>
+				<?php } ?>
+			</select>
+		</div> 	
 		<div class="form-group" style="position:relative">
             <div>
                 <input type="text" class="form-control datetimepicker_start_search" name="bdate" id="bdate" value='<?php echo $search['bdate'];?>' placeholder="From..." autocomplete="off">
@@ -331,10 +339,7 @@
                 <input type="text" class="form-control datetimepicker_end_search" name="edate" id="edate" value='<?php echo $search['edate'];?>' placeholder="To..." autocomplete="off">
             </div>
         </div>
-		<div class="form-group">
-			<!-- <label for="title">Company Name:</label> -->
-			<input class="form-control" type='text' name='company' value='<?php echo $search['company'];?>' placeholder="Contract name...">
-		</div> 
+		
 		<div class="form-group">
 			<select name='category' class="form-control">
 				<option value='0' <?php if($search['category'] == 0 ){echo 'selected';}?>>Debris & Sweeping</option>
@@ -399,11 +404,11 @@
 
 							<td class="text-left"><input name="checkall[]" type="checkbox" value="<?php echo $contract_id.'#'.$category.'#'.$date?>"></td>
 
-							<td><?php echo date('m/d/Y', strtotime($date));?></td>	
+							<td  style="width:10%"><?php echo date('m/d/Y', strtotime($date));?></td>	
 											
-							<td><?php echo $contract[$contract_id];?></td>
+							<td  style="width:15%"><?php echo $contract[$contract_id];?></td>
 
-							<td><?php echo $category==1?'Debris':'Sweeping';?></td>
+							<td  style="width:10%"><?php echo $category==1?'Debris':'Sweeping';?></td>
 
 
 
@@ -411,7 +416,7 @@
 								<table rules="rows" >
 									<?php foreach($scvvv['crew'] as $scvvvk=>$crew) {?>
 	        							<tr>
-	        								<td style="width:170px;  padding: 8px"><?php echo $crew['all_mile'];?></td>
+	        								<td style="width:160px;  padding: 8px"><?php echo $crew['all_mile'];?></td>
 	        							
 	        								<td style="width:200px">
 												<?php //version 2
@@ -426,7 +431,7 @@
 												}?>
 
 											</td>
-											<td style="width:170px">
+											<td style="width:250px">
 												<?php if($crew['employee']){
 														foreach( $crew['employee'] as $employee){
 															echo $employee.'<br>';
@@ -436,7 +441,7 @@
 													}
 												?>	
 											</td>
-											<td style="width:170px">
+											<td style="width:100px">
 												<?php if($crew['truck']){
 														foreach( $crew['truck'] as $truck){
 															echo $truck.'<br>';

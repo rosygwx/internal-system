@@ -654,27 +654,38 @@ class Tool_model extends CI_Model {
 
 	 
 
-	  function getStartAndEndDate($week, $year) {
-		  $dto = new DateTime();
-		  $dto->setISODate($year, $week);
-		  $ret['week_start'] = $dto->format('m-d-Y');
-		  $dto->modify('+6 days');
-		  $ret['week_end'] = $dto->format('m-d-Y');
-		  return $ret;
+	function getStartAndEndDate($week, $year) {
+		$dto = new DateTime();
+		$dto->setISODate($year, $week);
+	    $ret['week_start'] = $dto->format('m-d-Y');
+		$dto->modify('+6 days');
+		$ret['week_end'] = $dto->format('m-d-Y');
+		return $ret;
+	}
+
+
+	function formatDouble($number){
+		if(floor($number)==$number){
+			return number_format($number);
+		}else{
+			return floor($number * 10) == $number * 10 ? number_format($number, 1) : number_format($number, 2);
 		}
+	}
 
-	  function permission() {
-	    $this->permission_model->permission();
 
-	  }
-	  function permission_city() {
-	    $this->permission_model->permission_city();
 
-	  }
-	  function permission_mem_sign() {
-	    $this->permission_model->permission_mem_sign();
+	function permission() {
+	  $this->permission_model->permission();
 
-	  }
+	}
+	function permission_city() {
+	  $this->permission_model->permission_city();
+
+	}
+	function permission_mem_sign() {
+	  $this->permission_model->permission_mem_sign();
+
+	}
 
 
 }

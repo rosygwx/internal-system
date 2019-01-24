@@ -2,10 +2,14 @@
 <?php $this->load->view('template/sidebar.php');?>
 <!DOCTYPE html>
 <html>
+<style type="text/css">
+	td {
+		font-size: 16px;
+	}
+</style>
 <script type="text/javascript">
 	 
 	$(function () {
-		console.log('1');
         $('.date').datetimepicker({
         	format:"MM/DD/YYYY"
         	//viewMode: 'months'
@@ -73,6 +77,7 @@
 
 	<!-- version 2 -->
 	<form class="form form-inline" method="get" action="<?php echo BASE_URL().'contract/dailyReport'?>">
+		
 		<div class="form-group" style="position: relative;">
 			<select class="form-control" name="id"  autocomplete="off">
 				<?php foreach($contractAll as $kcon => $con){ ?>
@@ -80,17 +85,19 @@
 				<?php } ?>
 			</select>
 		</div>
+
 		<div class="form-group" style="position: relative;">
 			<input class="form-control date" type="text" name="date" <?php if($date): ?> value="<?php echo $date;?>" <?php endif?> placeholder="Date..." autocomplete="off" required>
 		</div>
 		
-		<!-- <div class="form-group" style="position: relative;">
-			<select class="form-control" name="ifschedule" autocomplete="off"> 
-				<option value=""> All status </option>
-				<option value="1"> Scheduled </option>
-				<option value="2"> Unscheduled </option>
+	    <div class="form-group" style="position: relative;">
+			<select class="form-control" name="category" autocomplete="off"> 
+				<option value="" <?php if(!$category): ?> selected <?php endif?>> Debris & Sweeping </option>
+				<option value="1" <?php if($category == 1): ?> selected <?php endif?>> Debris </option>
+				<option value="2" <?php if($category == 2): ?> selected <?php endif?>> Sweeping </option>
 			</select>
-		</div> -->
+		</div> 
+
 		<input type="hidden" name="ifPrint" id="ifPrint" value="0">
 		<input type="submit" class='btn btn-primary btn-submit'  value='Search'>
 		<input type="submit" class='btn btn-primary btn-submit' onclick="return exportPdf();" value="Export to PDF">
@@ -103,7 +110,7 @@
 	<?php 
 	foreach($report as $krep => $vrep){
 	foreach($vrep as $kri => $vri){?>
-	<div class="col-lg-12">
+	<div>
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h4><?php echo $task_cat[$kri]['category'].' '.$task_cat[$kri]['type']; ?></h4>
@@ -115,31 +122,34 @@
 							<table width="100%" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline" role="grid" aria-describedby="dataTables-example_info">
 								<thead>
 									<tr role="row">
-										<th class="sorting_asc" width="6%">
+										<th class="sorting_asc" width="4%">
 											Tract
 										</th>
-										<th class="sorting_asc" width="8%">
+										<th class="sorting_asc" width="7%">
 											HWY
 										</th>
-										<th class="sorting_asc" width="6%">
+										<th class="sorting_asc" width="5%">
 											Type
 										</th>
-										<th class="sorting_asc" width="22%">
+										<th class="sorting_asc" width="19%">
 											From
 										</th>
-										<th class="sorting_asc" width="22%">
+										<th class="sorting_asc" width="19%">
 											To
 										</th>
 										<th class="sorting_asc" width="6%">
 											Mileage
 										</th>
-										<th class="sorting_asc" width="6%">
+										<th class="sorting_asc" width="5%">
 											Cycle
 										</th>
 										<th class="sorting_asc" width="14%">
 											Frequency
 										</th>
-										<th class="sorting_asc" >
+										<th class="sorting_asc" width="9%">
+											Complete Date
+										</th>
+										<th class="sorting_asc" width="12%">
 											Comment
 										</th>
 									</tr>
@@ -172,6 +182,9 @@
 											<?php echo $vvri['frequency']; ?>
 										</td>
 										<td>
+											<?php echo $vvri['date']; ?>
+										</td>
+										<td>
 											<?php echo $vvri['comment']; ?>
 										</td>
 									</tr>
@@ -183,7 +196,7 @@
 										<td>
 											<?php echo number_format($sum[$kri], 2); ?>
 										</td>
-										<td colspan="3" >
+										<td colspan="4" >
 											
 										</td>
 									</tr>

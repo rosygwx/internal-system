@@ -59,7 +59,7 @@
 		.task td, .task th{
 			border: 1px solid black;
 			/*text-align: center;*/
-			height: 25px;
+			height: 18px;
 		}
 
 		.task th{
@@ -68,13 +68,19 @@
 
 		.task td {
 			margin-left: 2px;
+			/*font-size: 15px;*/
+		}
+
+		.lulu {
+			display: inline-block;
 		}
 
 		.assign {
-			width: 40%;
+			width: 50%;
 			table-layout:fixed;
 			border-collapse: collapse;
 			margin-bottom: 10px;
+			float: left;
 		}
 
 		.assign td, .assign th{
@@ -82,6 +88,30 @@
 			text-align: left;
 			height: 25px;
 		}
+
+		.assign th {
+			background-color: #cccccc;
+		}
+
+		.note {
+			width: 30%;
+			padding-left: 4%;
+		}
+
+		.comment {
+			margin-top: 30px;
+		}
+
+		.label {
+			font-weight: bold;
+		}
+
+		.underline {
+			margin-left: 85px;
+			border-bottom: 1px solid black; 
+			min-width: 90px;
+		}
+
 	</style>
 </head>
 <?php if($workReport){?>
@@ -115,11 +145,12 @@
 			<div class="">
 				<table class="task">
 					<tr>
-						<th style="width:7%">TRC</th>
-						<th style="width:7%">TYPE</th>
-						<th style="width:11%">HWY</th>
+						<th style="width:6%">TRC</th>
+						<th style="width:6%">TYPE</th>
+						<th style="width:10%">HWY</th>
 						<th style="">FROM</th>
 						<th style="">TO</th>
+						<th style="width:8%">ONE - PASS<br>MILE</th>
 						<th style="width:8%">START<br>TIME</th>
 						<th style="width:8%">STOP<br>TIME</th>
 						<th style="width:11%">COMPLETE<br>DATE</th>
@@ -131,16 +162,17 @@
 							<td style="text-align: center;"><?php echo $task['hwy_id']?></td>
 							<td><?php echo $task['section_from']?></td>
 							<td><?php echo $task['section_to']?></td>
+							<td style="text-align: center;"><?php echo $task['mile']?></td>
 							<td><?php echo $task['btime']?></td>
 							<td><?php echo $task['etime']?></td>
-							<td><?php echo $task['status']?></td>
+							<td><?php echo $task['date']?></td>
 						</tr>
 					<?php } ?>
 					
 				</table>
 			</div>
 
-			<div class="">
+			<div class="lulu">
 				<table class="assign">
 					<tr>
 						<th>DRIVER NAME</th>
@@ -160,9 +192,24 @@
 						<td>&nbsp</td>
 					</tr>
 				</table>
+				<table  class="note">
+					<tr><th style="text-align: left;">Note</th></tr>
+					<tr><td>Type I: Left Shoulder</td></tr>
+					<tr><td>Type II: Right Shoulder</td></tr>
+					<tr><td>Type III: Frontage Road</td></tr>
+					<tr><td>Type IV: Entrance/Exit Ramp</td></tr>
+					<tr><td>Type V: Highway Interchange</td></tr>	
+				</table>
 			</div>
 
-		
+			<div class="comment">
+				<label class="label">Comment:</label>
+				<div class="underline"></div>
+				<div class="underline" style="padding-top:35px"></div>
+				<div class="underline" style="padding-top:35px"></div>
+			</div>
+
+
 		</div>
 	<?php } ?>
 </body>

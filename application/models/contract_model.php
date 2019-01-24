@@ -93,29 +93,39 @@ class Contract_model extends CI_Model{
 	}
 	
 	
-	public function revenue(){
-		$query = 'select company.company_name , contract.contract_id_pannell, a.contract_id, contract.quote_real, sum(earned_contract) as "earned_contract", concat(format(sum(earned_contract) / contract.quote_real * 100 ,2 ) , "%") as "revenue_real", 100* (timestampdiff(day,contract.bdate,now()))/(timestampdiff(day,contract.bdate,date_add(contract.bdate, interval contract.month month))) as "revenue_standard", sum(earned_current_month) as "earned_current_month", sum(current_month) as "current_month", format(sum(earned_current_month)/sum(current_month) * 100 ,2 ) as "current_process"
+	public function revenue($contractStatus = ''){
+		$query = '
 
-		from (select task.task_id, task.contract_id, task.unit_price * sum(case when schedule.date is not null then 1 else 0 end) as earned_contract, 
-        task.unit_price * sum(case when year(schedule.date) = year(now()) and month(schedule.date) = month(now()) then 1 else 0 end) as earned_current_month, 
-        task.unit_price * sum(case when schedule.schedule_year = year(now()) and schedule.schedule_month = month(now()) then 1 else 0 end) as current_month
+		select company.company_name , contract.contract_id_pannell, a.contract_id, contract.quote_real, sum(earned_contract) as "earned_contract", concat(format(sum(earned_contract) / contract.quote_real * 100 ,2 ) , "%") as "revenue_real", 100* (timestampdiff(day,contract.bdate,now()))/(timestampdiff(day,contract.bdate,date_add(contract.bdate, interval contract.month month))) as "revenue_standard", sum(earned_current_month) as "earned_current_month", sum(current_month) as "current_month", format(sum(earned_current_month)/sum(current_month) * 100 ,2 ) as "current_process"
+
+		from 
+
+		(select task.task_id, task.contract_id, task.unit_price * sum(case when schedule.date is not null then schedule.unit else 0 end) as earned_contract, 
+        task.unit_price * sum(case when year(schedule.date) = year(now()) and month(schedule.date) = month(now()) then schedule.unit else 0 end) as earned_current_month, 
+        task.unit_price * sum(case when schedule.schedule_year = year(now()) and schedule.schedule_month = month(now()) then schedule.unit else 0 end) as current_month
         
-	from schedule 
-	left join task
-	on task.task_id = schedule.task_id
-	left join task_cat 
-	on task.tcat_id = task_cat.tcat_id
-    where task.isdeleted = 0
-		and schedule.isdeleted = 0
-	group by schedule.task_id) a
-	left join contract
-	on contract.contract_id = a.contract_id
-	left join company
-	on company.company_id = contract.company_id
+		from schedule 
+		left join task
+		on task.task_id = schedule.task_id
+		left join task_cat 
+		on task.tcat_id = task_cat.tcat_id
+	    where task.isdeleted = 0
+			and schedule.isdeleted = 0
+		group by schedule.task_id) a
+
+		left join contract
+		on contract.contract_id = a.contract_id
+		left join company
+		on company.company_id = contract.company_id
 	
-where contract.isdeleted = 0
-and company.type = 1	
-group by a.contract_id
+		where contract.isdeleted = 0
+		';
+
+		if($contractStatus != ''){$query .= 'and contract.status = '.$contractStatus;}
+
+		$query .= '  
+		and company.type = 1	
+		group by a.contract_id
 	;';
 
 		$res = $this->db->query($query);

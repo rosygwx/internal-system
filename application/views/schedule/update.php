@@ -52,14 +52,14 @@
         }
 
         .width7{
-        	width: 7%;
+        	width: 8%;
         }
 
 		/*.timepicker {
 			height: 2em;
 		}*/
 
-		.scheduleTable {
+		.scheduleTable , .taskExtraTable {
 			min-height:300px;
 			max-height:700px;
 			overflow-y:scroll;  /*纵向滚动条始终显示 */
@@ -73,6 +73,7 @@
 		th, .text-center {
 			text-align: center;
 		}
+
 
 		.lalala {
 			margin-bottom: 33px;
@@ -99,9 +100,11 @@
             });
        		
        		$('.timepicker').datetimepicker({
-            	format:'HH:mm',
+            	format:'hh:mm a',
             	useCurrent: false
             });
+
+            $('.timepicker').datetimepicker('hide');
         
 
        
@@ -395,6 +398,7 @@
 					
 				</div>
 
+
 				<div class="form-group">
 					<!-- <label class="col-md-2 control-label">Schedule:</label> -->
 					<div class="col-md-12 scheduleTable">
@@ -439,6 +443,53 @@
 										</select>
 									</td>
 									<!-- <td><input class="status-schedule" type="checkbox" name="status[]" value="<?php echo $t['schedule_id']?>" <?php if($t['status']==1){ ?> checked <?php } ?> ></td> -->
+								</tr>
+							<?php } ?>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<hr>
+
+				<div class="form-group">
+					<div class="col-md-12 taskExtraTable">
+						<table class="table table-responsive table-striped table-bordered table-hover dataTable no-footer dtr-inline" >
+							<thead>
+								<tr>
+
+									<!-- <th>Select</th> -->
+									<th>Type</th>
+									<th>Tract</th>
+									<th>HWY</th>
+									<th>From</th>
+									<th>To</th>
+									<th>Unit Price</th>
+									<th>Total Bid</th>
+									<th>Used Bid</th>
+									<th>Bid</th>
+									
+								</tr>
+							</thead>
+							<tbody>
+							<?php foreach($taskEx as $t){?>
+								<input type='hidden' name='task_id_arr_extra[]' value='<?php echo $t['task_id']?>' ></input>
+								<input type='hidden' name='schedule_id_arr_extra[]'  value='<?php echo $t['schedule_id']?>' ></input>
+								<input type='hidden' name='unit_price_arr_extra[]'  value='<?php echo $t['unit_price']?>' ></input>
+								<tr class="gradA odd" role="row">
+									<!-- td class="center"><input class="form-control" type="checkbox" name="check_extra[]" value="<?php echo $t['task_id']?>" autocomplete="off"></td> -->
+									<td style="vertical-align: middle;"><?php echo $t['tcat_name'];?></td>
+									<td class="text-center" style="vertical-align: middle;"><?php echo $t['tract'];?></td>
+									
+									<td class="text-center" style="vertical-align: middle;"><?php echo $t['hwy_id'];?></td>
+									<td style="vertical-align: middle;"><?php echo $t['section_from'];?></td>
+									<td style="vertical-align: middle;"><?php echo $t['section_to'];?></td>
+									<td  class="text-center" style="vertical-align: middle;"><?php echo '$'.$t['unit_price'];?></td>
+									<td  class="text-center" style="vertical-align: middle;"><?php echo $t['cycle'];?></td>
+									<td  class="text-center" style="vertical-align: middle;"><?php echo $t['unitSum'];?></td>
+									<td><input class="form-control" type="text" name="unit_arr_extra[]" value="<?php echo $t['unit'];?>" autocomplete="off"></td>
+								
+
 								</tr>
 							<?php } ?>
 							</tbody>

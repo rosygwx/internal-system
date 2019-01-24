@@ -99,7 +99,7 @@ class Schedule_model extends CI_Model{
 
 
 	public function add($data) {
-		$filds = array('task_id', 'schedule_year', 'schedule_month', 'schedule_week', 'schedule_date', 'btime_req', 'btime', 'etime', 'working_hour', 'traffic_hour', 'billing_hour', 'comment', 'location', 'contact', 'ifschedule', 'travel_hour', 'traffic_control_price', 'disposal_price', 'unit_price', 'crew_id', 'pon', 'addtime');
+		$filds = array('task_id', 'schedule_year', 'schedule_month', 'schedule_week', 'schedule_date', 'date', 'ori_date', 'btime_req', 'btime', 'etime', 'working_hour', 'traffic_hour', 'billing_hour', 'comment', 'location', 'contact', 'ifschedule', 'travel_hour', 'traffic_control_price', 'disposal_price', 'unit', 'unit_price', 'crew_id', 'pon', 'status', 'addtime');
 		foreach($filds as $value){
 			if( isset($data[$value])  ){
 				$newarr[$value] = $data[$value];
@@ -147,12 +147,24 @@ class Schedule_model extends CI_Model{
 	
 	
 	public function update($data,$where){
-		$filds = array('task_id', 'schedule_year', 'schedule_month', 'schedule_week', 'schedule_date', 'date', 'btime_req', 'btime', 'etime', 'working_hour', 'travel_hour', 'billing_hour', 'comment', 'contact', 'location', 'ifschedule', 'traffic_control_price', 'disposal_price', 'unit_price', 'crew_id', 'pon', 'status');
+		$filds = array('task_id', 'schedule_year', 'schedule_month', 'schedule_week', 'schedule_date', 'date', 'ori_date', 'btime_req', 'btime', 'etime', 'working_hour', 'travel_hour', 'billing_hour', 'comment', 'contact', 'location', 'ifschedule', 'traffic_control_price', 'disposal_price', 'unit', 'unit_price', 'crew_id', 'pon', 'status');
 		foreach($filds as $value){
 			if(isset($data[$value])){
 				$newarr[$value] = $data[$value];
-			}else
+				$value == 'date' && $data[$value] == ""? $newarr['date'] = null : '';
+				$value == 'schedule_date' && $data[$value] == ""? $newarr['schedule_date'] = null : '';
+				$value == 'ori_date' && $data[$value] == ""? $newarr['ori_date'] = null : '';
+				$value == 'min_date' && $data[$value] == ""? $newarr['min_date'] = null : '';
+				$value == 'max_date' && $data[$value] == ""? $newarr['max_date'] = null : '';
+				$value == 'btime_req' && $data[$value] == ""? $newarr['btime_req'] = null : '';
+				$value == 'btime' && $data[$value] == ""? $newarr['btime'] = null : '';
+				$value == 'etime' && $data[$value] == ""? $newarr['etime'] = null : '';
+			}else{
+				//isset($data[$value]) && $value == 'date' ? $newarr['date'] = null : '';
+				//isset($data[$value]) && $value == 'btime' ? $newarr['btime'] = null : '';
+				//isset($data[$value]) && $value == 'etime' ? $newarr['etime'] = null : '';
 				continue;
+			}
 		}
 		return  $this->db->update($this->schedule_table, $newarr , $where); 
 	}

@@ -41,6 +41,14 @@
 						<option value='2' <?php if($search['company_type'] ==2){echo 'selected';}?>>Commercial</option>
 					</select>
 				</div>
+
+				<div class="form-group">
+					<select name='status' class="form-control">
+						<option value='' <?php if($search['status'] == ''){echo 'selected';}?>>All Status</option>
+						<option value='1' <?php if($search['status'] ==1){echo 'selected';}?>>Active</option>
+						<option value='2' <?php if($search['status'] ==2){echo 'selected';}?>>Inactive</option>
+					</select>
+				</div>
 				
 				<button type="submit" class="btn btn-submit btn-primary btn-sm" onclick="getVal()">Search</button>
 			  </form>

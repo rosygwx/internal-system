@@ -185,6 +185,17 @@
 					</div>
 				</div>
 
+				<div class="form-group">
+					<label class="col-md-2 control-label"><i>*</i>Status:</label>
+					<div class="col-md-10">
+						<select name="status" class="form-control">
+							<option value="1" <?php if($contract->status == 1){?>selected <?php } ?> >Active</option>
+							<option value="2" <?php if($contract->status == 2){?>selected <?php } ?> >Comlete</option>
+							<option value="3" <?php if($contract->status == 3){?>selected <?php } ?> >Terminate</option>
+						</select>
+					</div>
+				</div>
+
 
 				<br>
 

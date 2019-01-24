@@ -103,7 +103,7 @@
 
         	
             $('.datetimepicker_start').datetimepicker({
-            	format:'HH:mm',
+            	format:'hh:mm a',
             	useCurrent: false
             });
             //$('#btime').val('');
@@ -111,7 +111,7 @@
         
         
             $('.datetimepicker_end').datetimepicker({
-            	format:'HH:mm',
+            	format:'hh:mm a',
             	useCurrent: false
             });
         
@@ -354,8 +354,8 @@
 			<form action="<?php echo BASE_URL();?>schedule/add" method='post' class='form-horizontal' enctype='multipart/form-data' onsubmit="return finalCheck();">
 				<input type='hidden' name='backurl'  id='backurl' value='<?=$_SERVER['HTTP_REFERER']?>' ></input>
 				<input type='hidden' name='company_type'  id='company_type' value='2' ></iput>
-				<input type='hidden' name='unit_price'  id='unit_price' value='' ></iput>
-				<input type='hidden' name='unit_price_2'  id='unit_price_2' value='' ></iput>
+				<input type='hidden' name='unit_price'  id='unit_price' value=<?php echo $task[0]->unit_price ?> ></iput>
+				<input type='hidden' name='unit_price_2'  id='unit_price_2' value=<?php echo $task[0]->unit_price_2 ?> ></iput>
 				
 		    	<div class="form-group">
 					<label class="col-md-2 control-label"><i>*</i>Contract Name:</label>
@@ -432,7 +432,7 @@
 							<input type='checkbox' name="unscheduled" value="1" >Unscheduled
 						</div>
 						<div class='col-md-3 checkbox'>
-							<input type='checkbox' name="iftravelhour" value="1" id="iftravelhour" <?php if($travel_hour){?> checked <?php } ?> >Travel Hour
+							<input type='checkbox' name="iftravelhour" value="1" id="iftravelhour" <?php if($task[0]->travel_hour){?> checked <?php } ?> >Travel Hour
 						</div>
 						<div class='col-md-3 input-group'>
 							<input type='text' class="form-control" name="travel_hour" value="2" >
@@ -467,7 +467,7 @@
 				<div class="form-group">
 					<label class="col-md-2 control-label">PO#:</label>
 					<div class='col-md-10'>
-	                    <input type='text' class="form-control" id='pon' name="pon" autocomplete="off" value='<?php echo $task[0]->pon; ?>' required>
+	                    <input type='text' class="form-control" id='pon' name="pon" autocomplete="off" value='<?php echo $task[0]->pon; ?>' >
 	                </div> 
 				</div>
 

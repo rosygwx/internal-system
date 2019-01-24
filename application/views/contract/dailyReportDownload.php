@@ -9,7 +9,8 @@
 	<title></title>
 	<style type="text/css">
 		.page {
-			height: 1000px;
+			/*height: 1000px;*/
+			height: 1200px;
 			
 		}
 
@@ -22,11 +23,14 @@
 		#summary {
 			float: left;
 			width: 18%;
+			margin-right:2%;
 		}
 
 		#worklog {
-			float: center;
-			margin-left: 15%;
+			/*float: center;
+			position: center;
+			padding-left: 10px;
+			padding: .5em 1em;*/
 			width: 15%;
 		}
 
@@ -41,8 +45,12 @@
 			border: 1px solid black;
 		}
 
+		/*#worklog td, #worklog th {
+			border-left-width: 0px;
+		}*/
+
 		#dailyReport th , #summary th, #worklog th {
-			font-size: 12px;
+			font-size: 13px;
 			background-color: #DBDBDB;
 			padding-top: 2px;
 		    padding-bottom: 2px;
@@ -62,17 +70,17 @@
 		}
 
 		#dailyReport td {
-			font-size: 10px;
+			font-size: 12px;
 		}
 
 		#dailyReport tr:hover {
 			background-color: #F1F0F0;
 		}
 
-		.caption {
+		/*.caption {
 			text-align: left;
 			font-size: 14px;
-		}
+		}*/
 
 		.clear {
 			clear: both;
@@ -118,7 +126,7 @@
 								FROM
 							</th>
 							<td>
-								<?php echo $time[$key]['from'];?>
+								<?php echo $time[$key]['from'] ? date('H:i a', $time[$key]['from'] ) : '';?>
 							</td>
 						</tr>
 						<tr role="row">
@@ -126,7 +134,7 @@
 								TO
 							</th>
 							<td>
-								<?php echo $time[$key]['to'];?>
+								<?php echo $time[$key]['to'] ? date('H:i a', $time[$key]['to'] ) : '';?>
 							</td>
 						</tr>
 						<tr role="row">
@@ -202,29 +210,32 @@
 													</th>
 												</tr>
 												<tr role="row">
-													<th class="sorting_asc" width="6%">
+													<th class="sorting_asc" width="4%">
 														Tract
 													</th>
-													<th class="sorting_asc" width="8%">
+													<th class="sorting_asc" width="7%">
 														HWY
 													</th>
-													<th class="sorting_asc" width="6%">
+													<th class="sorting_asc" width="5%">
 														Type
 													</th>
-													<th class="sorting_asc" width="22%">
+													<th class="sorting_asc" width="19%">
 														From
 													</th>
-													<th class="sorting_asc" width="22%">
+													<th class="sorting_asc" width="19%">
 														To
 													</th>
 													<th class="sorting_asc" width="6%">
 														Mileage
 													</th>
-													<th class="sorting_asc" width="6%">
+													<th class="sorting_asc" width="5%">
 														Cycle
 													</th>
 													<th class="sorting_asc" width="14%">
 														Frequency
+													</th>
+													<th class="sorting_asc" width="9%">
+														Complete Date
 													</th>
 													<th class="sorting_asc" width="">
 														Comment
@@ -260,6 +271,9 @@
 														<?php echo $vvri['frequency']; ?>
 													</td>
 													<td>
+														<?php echo $vvri['date']; ?>
+													</td>
+													<td>
 														<?php echo $vvri['comment']; ?>
 													</td>
 													
@@ -272,7 +286,7 @@
 													<td>
 														<?php echo number_format($sum[$kri], 2); ?>
 													</td>
-													<td colspan="3" >
+													<td colspan="4" >
 														
 													</td>
 													

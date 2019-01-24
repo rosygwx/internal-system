@@ -69,7 +69,7 @@ class Worklog_model extends CI_Model{
 		//$total = $this->db->query('SELECT FOUND_ROWS() count;');
 		$total = $this->db->count_all_results($this->worklog_table, false);
 		$query = $this->db->get( '', $pagesize , ($page-1) * $pagesize);
-		//echo $this->db->last_query();
+		//echo $this->db->last_query();exit;
 		
 
 		$reuslt = array();
