@@ -467,16 +467,20 @@ class Contract extends CI_Controller {
 		$input = $this->input->get();
 		$company_type = isset($input['company_type']) && !empty($input['company_type']) ? $input['company_type'] : 1;//1:txdot, 2:commercial
 		$statusContract = isset($input['status']) && $input['status'] != '' ? $input['status'] : '';
-
+		$date = isset($input['date']) && $input['date'] != '' ? explode('/', $input['date']) : [date('m'), date('Y')];
+		$year = $date[1];
+		$month = trim($date[0], '0');
+		//var_dump($date, $month);
 		if($company_type ==1 ){//txdot
 			
-			$res = $this->contract_model->revenue($statusContract);
-
+			$res = $this->contract_model->revenue($statusContract, $year, $month);
+			//var_dump($res);
 
 			$sumQuoteReal = 0;
 			$sumEarnedContract = 0;
 			$sumEarnedCurrentMonth = 0;
 			$sumCurrentMonth = 0;
+			$sumEarnedCurrentMonthExtra = 0;
 
 			//var_dump($res);
 			foreach($res as $ress){
@@ -492,9 +496,10 @@ class Contract extends CI_Controller {
 				$sumEarnedContract += $ress->earned_contract;
 				$sumEarnedCurrentMonth += $ress->earned_current_month;
 				$sumCurrentMonth += $ress->current_month;
+				$sumEarnedCurrentMonthExtra += $ress->earned_current_month_extra;
 			}
 
-			$sum = [(object)['contract_id' => '0', 'contract_id_pannell' => 'TOTAL', 'quote_real' => $sumQuoteReal, 'earned_contract' => $sumEarnedContract, 'earned_current_month' => $sumEarnedCurrentMonth, 'current_month' => $sumCurrentMonth]];
+			$sum = [(object)['contract_id' => '0', 'contract_id_pannell' => 'TOTAL', 'quote_real' => $sumQuoteReal, 'earned_contract' => $sumEarnedContract, 'earned_current_month' => $sumEarnedCurrentMonth, 'current_month' => $sumCurrentMonth, 'earned_current_month_extra' => $sumEarnedCurrentMonthExtra]];
 
 			$res = array_merge($res, $sum);
 		}else{//commercial
@@ -514,6 +519,7 @@ class Contract extends CI_Controller {
 		//search variables
 		$search['company_type'] = $company_type;
 		$search['status'] = $statusContract;
+		$search['date'] = $date[0].'/'.$date[1];
 
 		$data['revenue'] = $res;
 		$data['company_type'] = $company_type;
@@ -584,17 +590,18 @@ class Contract extends CI_Controller {
 					//var_dump($bill);exit;
 				}else{
 					$bill[$resTemp['tcat_id']][$res->task_id]['price'] += $resTemp['price'];
+
 					$bill[$resTemp['tcat_id']][$res->task_id]['date'][$resTemp['schedule_week']][] = $resTemp['date'];
 				}
 
-				$sum[$res->tcat_id]['price'] += $resTemp['price'];
+				$sum[$resTemp['tcat_id']]['price'] += $resTemp['price'];
 
 
 				//week
 				!in_array($resTemp['schedule_week'], $week) ? $week[] = $resTemp['schedule_week'] : '';
 				//
 				
-				!in_array($res->category, [3, 4]) ? $sum[0] += $res->price : '';
+				!in_array($res->category, [3, 4]) ? $sum[0] += $resTemp['price'] : '';
 
 
 				/*$billTemp = ['tract' => $resTemp['tract'], 'schedule_id' => $res->schedule_id, 'hwy_id' => $resTemp['hwy_id'], 'section_to' => $resTemp['section_to'], 'section_from'=>$resTemp['section_from'], 'price' => $resTemp['price'], 'type' => $resTemp['type'], 'date'=>$resTemp['date']];
@@ -608,7 +615,6 @@ class Contract extends CI_Controller {
 					$sum[99999] += $resTemp['price'];
 				} */
  
-				unset($billTemp, $resTemp);
 				
 				if(!in_array($res->tcat_id, $task_cat)){
 					switch ($res->category) {
@@ -623,15 +629,16 @@ class Contract extends CI_Controller {
 							break;
 					}
 					
-					$task_cat[$res->tcat_id] = ['type' => $res->type, 'category' => $categoryTemp];
+					$task_cat[$resTemp['tcat_id']] = ['type' => $res->type, 'category' => $categoryTemp];
 
-					unset($categoryTemp);
+					unset($billTemp, $resTemp, $categoryTemp);
 				}
 
 				// 
 			}
 			ksort($bill);
-			
+			sort($week);
+			//var_dump($week);
 
 			//selected contract
 			$contractCur = ['name' => $contract[$contract_id]['contract_id_pannell'], 'id' => $contract_id ,'ori_id' => $contract[$contract_id]['contract_id_ori']];
@@ -640,10 +647,10 @@ class Contract extends CI_Controller {
 			$where_bill_pro['task.contract_id'] = $contract_id;
 			$where_bill_pro['schedule.ori_date >='] = $bdate; 
 			$where_bill_pro['schedule.ori_date <='] = $edate; 
-			$res_bill_pro = $this->contract_model->bill('sum(case when task_cat.category <> 4 then task.unit_price * schedule.unit else 0 end) sumpro, sum(case when task_cat.category = 4 then task.unit_price * schedule.unit else 0 end) sumextra', $where_bill_pro, $like = "", $json = true, $orderby = "", 1, 2000);
+			$res_bill_pro = $this->contract_model->bill('sum(case when task_cat.category not in (3, 4) then task.unit_price * schedule.unit else 0 end) sumpro, sum(case when task_cat.category in (3, 4) then task.unit_price * schedule.unit else 0 end) sumextra', $where_bill_pro, $like = "", $json = true, $orderby = "", 1, 2000);
 			$sum_pro = $res_bill_pro['result'][0]->sumpro;
 			$sum_extra = $res_bill_pro['result'][0]->sumextra;
-			//var_dump($category);
+			//var_dump($res_bill_pro['result'][0]->sumextra);
 
 			$data['bill'] = $bill;
 			$data['task_cat'] = $task_cat;

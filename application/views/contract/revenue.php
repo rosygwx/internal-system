@@ -11,6 +11,10 @@
 		        attr: true,
 		        speed: 400
 		    });
+
+		    $('.date').datetimepicker({
+        	format:"MM/YYYY"
+        });
 		})
 
 		setTimeout(function(){
@@ -49,6 +53,10 @@
 						<option value='2' <?php if($search['status'] ==2){echo 'selected';}?>>Inactive</option>
 					</select>
 				</div>
+
+				<div class="form-group" style="position: relative;">
+					<input class="form-control date" type="text" name="date" placeholder="" <?php if($search['date']):?> value="<?php echo $search['date']; ?>" <?php endif; ?> autocomplete="off" required>
+				</div>
 				
 				<button type="submit" class="btn btn-submit btn-primary btn-sm" onclick="getVal()">Search</button>
 			  </form>
@@ -71,8 +79,9 @@
 				  <th>Contract</th>
 				  <th>Earned/Quote</th>
 				  <th>Process/Standard Process</th>
-				  <th>Earned/Quote(current month)</th>
-				  <th>Process(current month)</th>
+				  <th>Earned/Quote(selected month)</th>
+				  <th>Extra Task <br>(selected month)</th>
+				  <th>Process(selected month)</th>
 				  <!-- <th>Standard Revenue Process</th> -->
 				 
 				  <!--<th style='text-align: left'></th>-->
@@ -94,7 +103,11 @@
 						<td> </td>
 					<?php }?>	
 
+
 					<td><?php echo "$".number_format($v->earned_current_month,2)." / $".number_format($v->current_month,2);?></td>	
+
+					<td><?php echo "$".number_format($v->earned_current_month_extra,2);?></td>	
+
 
 					<?php if($v->contract_id != 0){ ?>
 						<td class="progress progress-striped active" style="background-color: white;box-shadow: none;  ">
@@ -104,7 +117,7 @@
 		                                        	
 		                    </span>
 		                </td>
-		                <td class="text-left" style="width:15%; position: relative; ">
+		                <td class="text-left" style="width:10%; position: relative; ">
 		                	<a href="<?php echo BASE_URL(); ?>contract/monthlyBill/?id=<?=$v->contract_id?>">MonthlyBill  </a>
 		                	<a style="padding-left:3%;" href="<?php echo BASE_URL(); ?>contract/dailyReport/?id=<?=$v->contract_id?>">DailyReport  </a>
 		                </td>	

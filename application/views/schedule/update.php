@@ -48,11 +48,15 @@
 	 
 
         .width9{
-        	width: 9%;
+        	width: 10%;
         }
 
         .width7{
-        	width: 8%;
+        	width: 9%;
+        }
+
+        .width5{
+        	width: 7%;
         }
 
 		/*.timepicker {
@@ -415,7 +419,7 @@
 									<th class="width7">Start<br>Time</th>
 									<th class="width7">Stop<br>Time</th>
 									<th class="width9">Complete<br>Date</th>
-									<th class="width9">Crew</th>
+									<th class="width5">Crew</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -449,54 +453,54 @@
 						</table>
 					</div>
 				</div>
+				
+				<?php if($taskEx) {?>
+					<hr>
+					<div class="form-group">
+						<div class="col-md-12 taskExtraTable">
+							<table class="table table-responsive table-striped table-bordered table-hover dataTable no-footer dtr-inline" >
+								<thead>
+									<tr>
 
-				<hr>
-
-				<div class="form-group">
-					<div class="col-md-12 taskExtraTable">
-						<table class="table table-responsive table-striped table-bordered table-hover dataTable no-footer dtr-inline" >
-							<thead>
-								<tr>
-
-									<!-- <th>Select</th> -->
-									<th>Type</th>
-									<th>Tract</th>
-									<th>HWY</th>
-									<th>From</th>
-									<th>To</th>
-									<th>Unit Price</th>
-									<th>Total Bid</th>
-									<th>Used Bid</th>
-									<th>Bid</th>
+										<!-- <th>Select</th> -->
+										<th>Type</th>
+										<th>Tract</th>
+										<th>HWY</th>
+										<th>From</th>
+										<th>To</th>
+										<th>Unit Price</th>
+										<th>Total Bid</th>
+										<th>Used Bid</th>
+										<th>Bid</th>
+										
+									</tr>
+								</thead>
+								<tbody>
+								<?php foreach($taskEx as $t){?>
+									<input type='hidden' name='task_id_arr_extra[]' value='<?php echo $t['task_id']?>' ></input>
+									<input type='hidden' name='schedule_id_arr_extra[]'  value='<?php echo $t['schedule_id']?>' ></input>
+									<input type='hidden' name='unit_price_arr_extra[]'  value='<?php echo $t['unit_price']?>' ></input>
+									<tr class="gradA odd" role="row">
+										<!-- td class="center"><input class="form-control" type="checkbox" name="check_extra[]" value="<?php echo $t['task_id']?>" autocomplete="off"></td> -->
+										<td style="vertical-align: middle;"><?php echo $t['tcat_name'];?></td>
+										<td class="text-center" style="vertical-align: middle;"><?php echo $t['tract'];?></td>
+										
+										<td class="text-center" style="vertical-align: middle;"><?php echo $t['hwy_id'];?></td>
+										<td style="vertical-align: middle;"><?php echo $t['section_from'];?></td>
+										<td style="vertical-align: middle;"><?php echo $t['section_to'];?></td>
+										<td  class="text-center" style="vertical-align: middle;"><?php echo '$'.$t['unit_price'];?></td>
+										<td  class="text-center" style="vertical-align: middle;"><?php echo $t['cycle'];?></td>
+										<td  class="text-center" style="vertical-align: middle;"><?php echo $t['unitSum'];?></td>
+										<td><input class="form-control" type="text" name="unit_arr_extra[]" value="<?php echo $t['unit'];?>" autocomplete="off"></td>
 									
-								</tr>
-							</thead>
-							<tbody>
-							<?php foreach($taskEx as $t){?>
-								<input type='hidden' name='task_id_arr_extra[]' value='<?php echo $t['task_id']?>' ></input>
-								<input type='hidden' name='schedule_id_arr_extra[]'  value='<?php echo $t['schedule_id']?>' ></input>
-								<input type='hidden' name='unit_price_arr_extra[]'  value='<?php echo $t['unit_price']?>' ></input>
-								<tr class="gradA odd" role="row">
-									<!-- td class="center"><input class="form-control" type="checkbox" name="check_extra[]" value="<?php echo $t['task_id']?>" autocomplete="off"></td> -->
-									<td style="vertical-align: middle;"><?php echo $t['tcat_name'];?></td>
-									<td class="text-center" style="vertical-align: middle;"><?php echo $t['tract'];?></td>
-									
-									<td class="text-center" style="vertical-align: middle;"><?php echo $t['hwy_id'];?></td>
-									<td style="vertical-align: middle;"><?php echo $t['section_from'];?></td>
-									<td style="vertical-align: middle;"><?php echo $t['section_to'];?></td>
-									<td  class="text-center" style="vertical-align: middle;"><?php echo '$'.$t['unit_price'];?></td>
-									<td  class="text-center" style="vertical-align: middle;"><?php echo $t['cycle'];?></td>
-									<td  class="text-center" style="vertical-align: middle;"><?php echo $t['unitSum'];?></td>
-									<td><input class="form-control" type="text" name="unit_arr_extra[]" value="<?php echo $t['unit'];?>" autocomplete="off"></td>
-								
 
-								</tr>
-							<?php } ?>
-							</tbody>
-						</table>
+									</tr>
+								<?php } ?>
+								</tbody>
+							</table>
+						</div>
 					</div>
-				</div>
-
+				<?php } ?>
 
 
 				<hr>

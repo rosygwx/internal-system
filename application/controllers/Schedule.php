@@ -65,7 +65,7 @@ class Schedule extends CI_Controller {
 	}
 
 	/**
-	* Purpose: Contract list
+	* Purpose: Schedule list, depend on schedule_date
 	* @param {array} array  company, company_type, status, date and etc
 	* @return: {array}  result, search, page, current and etc
 	*/
@@ -79,6 +79,8 @@ class Schedule extends CI_Controller {
 		isset($input['category']) && $input['category'] ? $where['task_cat.category'] = $input['category']:'';
 		$where['schedule.schedule_date >='] = isset($input['bdate']) && $input['bdate'] != '' ? date("Y-m-d", strtotime(urldecode($input['bdate']))):date("Y-m-d", strtotime('- 1 day'));
 		$where['schedule.schedule_date <='] = isset($input['edate']) && $input['edate'] != '' ? date("Y-m-d", strtotime(urldecode($input['edate']))):date("Y-m-d");
+		
+
 		isset($input['week']) && $input['week'] != '' ? $where['schedule.schedule_week'] = $input['week']:'';
 		isset($input['year']) && $input['year'] != '' ? $where['schedule.schedule_year'] = $input['year']:'';
 		$where['company.type'] =  1;
@@ -93,7 +95,7 @@ class Schedule extends CI_Controller {
 		$pagesize_dis = 10;
 
 		$distinct_result = $this->schedule_model->lists('distinct schedule.schedule_date, contract.contract_id, contract.contract_id_pannell, task_cat.category', $where, $like, $json = true, $orderby = ['schedule.schedule_date'=>'desc','contract.contract_id'=>'desc','task_cat.category'=>'asc'], $page_dis, $pagesize_dis, '', 1);
-
+		
 		$where_in = [];
 		if($distinct_result['result']){
 			foreach($distinct_result['result'] as $dis){
@@ -526,7 +528,7 @@ class Schedule extends CI_Controller {
 				//var_dump($whereScheduleEx);
 				$resScheduleExRow = $this->task_model->lists('task.task_id, task.tract, task.hwy_id, task.cycle, task.section_from, task.section_to, task.unit_price, task_cat.tcat_name, schedule.unitSum, schedule2.schedule_id, schedule2.unit', $whereScheduleEx, '' , $json = true, ['task_cat.tcat_id'=>'asc'], 1, 500, $ifExtra = 1, $whereScheduleEx2);
 				$resScheduleExRow = $resScheduleExRow['result'];
-				//var_dump($resScheduleEx);
+				//var_dump($resScheduleExRow);
 
 				foreach($resScheduleExRow as $res){
 					$temp['task_id'] = $res->task_id ? $res->task_id : '';
@@ -670,7 +672,7 @@ class Schedule extends CI_Controller {
 					}
 				}
 
-				var_dump($wl_id_ori, $wl_id, $wl_id_arr);exit;
+				//var_dump($wl_id_ori, $wl_id, $wl_id_arr);exit;
 				//update and add worklog
 				foreach($wl_id_arr as $key => $wl_id){
 					if(in_array($wl_id, $wl_id_ori)){
@@ -1146,7 +1148,7 @@ class Schedule extends CI_Controller {
 
 
 	/**
-	* Purpose: Content of schedule calendar
+	* Purpose: Content of schedule calendar， depend on schedule_date for unfinished ones, date for finished ones
 	* @param null
 	* @return: {json}
 	*/
@@ -1174,10 +1176,16 @@ class Schedule extends CI_Controller {
 		//$where['schedule.schedule_month'] = 5;//test
 		//$where['schedule.schedule_year'] = 2018;//test
 		//$where['schedule.schedule_date is not null'] = null;//test
-		$start_format ? $where['schedule.schedule_date >='] = $start_format : '';
-		$end_format ? $where['schedule.schedule_date <='] = $end_format : '';
-		//var_dump($where);
-		$result = $this->schedule_model->lists($this->calendar_lists, $where, $like, $json = true, $orderby = ['schedule.schedule_date'=>'asc', 'contract.contract_id'=>'asc', 'task_cat.tcat_id'=>'asc', 'task.tract'=>'asc'], 1, 10000);
+		//$start_format ? $where['schedule.schedule_date >='] = $start_format : '';
+		//$end_format ? $where['schedule.schedule_date <='] = $end_format : '';
+		$whereQuery = [];
+		$whereQuery[] = '((schedule.schedule_date >= "'.$start_format.'" and schedule.schedule_date <= "'.$end_format.'") or (schedule.date >= "'.$start_format.'" and schedule.date <= "'.$end_format.'"))';
+
+		/*$start_format ? $whereQuery[] = '(schedule.schedule_date >= "'.$start_format.'" or schedule.date >= "'.$start_format.'")' : '';
+		$end_format ? $whereQuery[] = '(schedule.schedule_date <= "'.$end_format.'" or schedule.date <= "'.$end_format.'")' :'';*/
+
+
+		$result = $this->schedule_model->lists($this->calendar_lists, $where, $like, $json = true, $orderby = ['schedule.schedule_date'=>'asc', 'contract.contract_id'=>'asc', 'task_cat.tcat_id'=>'asc', 'task.tract'=>'asc'], 1, 10000, $where_in = '', $distinct = 0, $whereQuery);
 		//echo '<pre>';
 		//var_dump($result['result']);
 		$order = 0;//testing

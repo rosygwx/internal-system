@@ -93,16 +93,24 @@ class Contract_model extends CI_Model{
 	}
 	
 	
-	public function revenue($contractStatus = ''){
+	public function revenue($contractStatus = '', $year = 2019, $month = 1){
 		$query = '
 
-		select company.company_name , contract.contract_id_pannell, a.contract_id, contract.quote_real, sum(earned_contract) as "earned_contract", concat(format(sum(earned_contract) / contract.quote_real * 100 ,2 ) , "%") as "revenue_real", 100* (timestampdiff(day,contract.bdate,now()))/(timestampdiff(day,contract.bdate,date_add(contract.bdate, interval contract.month month))) as "revenue_standard", sum(earned_current_month) as "earned_current_month", sum(current_month) as "current_month", format(sum(earned_current_month)/sum(current_month) * 100 ,2 ) as "current_process"
+		select company.company_name , contract.contract_id_pannell, a.contract_id, contract.quote_real, 
+			sum(earned_contract) as "earned_contract", 
+			concat(format(sum(earned_contract) / contract.quote_real * 100 ,2 ) , "%") as "revenue_real", 
+			100* (timestampdiff(day,contract.bdate,now()))/(timestampdiff(day,contract.bdate,date_add(contract.bdate, interval contract.month month))) as "revenue_standard", 
+			sum(earned_current_month) as "earned_current_month", sum(current_month) as "current_month", format(sum(earned_current_month)/sum(current_month) * 100 ,2 ) as "current_process", 
+			sum(earned_current_month_extra) as "earned_current_month_extra"
 
 		from 
 
-		(select task.task_id, task.contract_id, task.unit_price * sum(case when schedule.date is not null then schedule.unit else 0 end) as earned_contract, 
-        task.unit_price * sum(case when year(schedule.date) = year(now()) and month(schedule.date) = month(now()) then schedule.unit else 0 end) as earned_current_month, 
-        task.unit_price * sum(case when schedule.schedule_year = year(now()) and schedule.schedule_month = month(now()) then schedule.unit else 0 end) as current_month
+		(select task.task_id, task.contract_id, 
+
+		task.unit_price * sum(case when schedule.date is not null then schedule.unit else 0 end) as earned_contract, 
+        task.unit_price * sum(case when year(schedule.date) = '.$year.' and month(schedule.date) = '.$month.' and task_cat.category in (1, 2) then schedule.unit else 0 end) as earned_current_month, 
+        task.unit_price * sum(case when year(schedule.ori_date) = '.$year.' and month(schedule.ori_date) = '.$month.' and task_cat.category in (1, 2) then schedule.unit else 0 end) as current_month,
+        task.unit_price * sum(case when year(schedule.date) = '.$year.' and month(schedule.date) = '.$month.' and task_cat.category in (3, 4) then schedule.unit else 0 end) as earned_current_month_extra
         
 		from schedule 
 		left join task

@@ -13,7 +13,7 @@ class Schedule_model extends CI_Model{
 	}
 
 
-	public function lists( $fields = '*' , $where = '', $like = '', $json = true, $orderby = array('schedule.addtime'=>'desc'), $page = 1, $pagesize = 500, $where_in = '', $distinct = 0){
+	public function lists( $fields = '*' , $where = '', $like = '', $json = true, $orderby = array('schedule.addtime'=>'desc'), $page = 1, $pagesize = 500, $where_in = '', $distinct = 0, $whereQuery = ''){
 		if( is_array( $fields ) ) {
 			$fld = implode( ',' , $fields );
 		}else
@@ -75,6 +75,12 @@ class Schedule_model extends CI_Model{
 		if( is_array($where_in )){
 			foreach($where_in as $key => $value){
 				$this->db->where_in($key, $value);
+			}
+		}
+
+		if(is_array($whereQuery)){
+			foreach($whereQuery as $key => $value){
+				$this->db->where($value);
 			}
 		}
 
