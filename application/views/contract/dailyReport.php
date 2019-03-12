@@ -4,7 +4,7 @@
 <html>
 <style type="text/css">
 	td {
-		font-size: 16px;
+		font-size: 15px;
 	}
 </style>
 <script type="text/javascript">
@@ -92,9 +92,10 @@
 		
 	    <div class="form-group" style="position: relative;">
 			<select class="form-control" name="category" autocomplete="off"> 
-				<option value="" <?php if(!$category): ?> selected <?php endif?>> Debris & Sweeping </option>
+				<option value="" <?php if(!$category): ?> selected <?php endif?>> All </option>
 				<option value="1" <?php if($category == 1): ?> selected <?php endif?>> Debris </option>
 				<option value="2" <?php if($category == 2): ?> selected <?php endif?>> Sweeping </option>
+				<option value="4" <?php if($category == 4): ?> selected <?php endif?>> Extra </option>
 			</select>
 		</div> 
 

@@ -62,6 +62,7 @@ class Manager_plus_model extends CI_Model{
 				AND LD.[Post Date] <= ''' + @edateeeeeeeeee + '''
 				), 0) [Fuel Cost]
 
+
 		FROM Assets
 
 		WHERE Assets.[Active] = ''true''

@@ -128,11 +128,13 @@ class Truck extends CI_Controller {
 			foreach($reportRaw as $rep){
 				$reportCur['asset_id'] = $rep->{'Asset ID'};
 				$reportCur['asset_name'] = $rep->{'Asset Code'};
-				$reportCur['cost_part'] = number_format($rep->{'Part Cost'}, 2);
-				$reportCur['cost_labor'] = number_format($rep->{'Labor Cost'}, 2);
-				$reportCur['cost_purchase'] = number_format($rep->{'Purchase Cost'}, 2);
-				$reportCur['cost_fuel'] = number_format($rep->{'Fuel Cost'}, 2);
-				$reportCur['sub_sum'] = number_format($reportCur['cost_part'] + $reportCur['cost_labor'] + $reportCur['cost_purchase'] + $reportCur['cost_fuel'], 2);
+				$reportCur['cost_part'] = $rep->{'Part Cost'};
+				$reportCur['cost_labor'] = $rep->{'Labor Cost'};
+				$reportCur['cost_purchase'] = $rep->{'Purchase Cost'};
+				$reportCur['cost_fuel'] = $rep->{'Fuel Cost'};
+
+				$reportCur['sub_sum'] = $reportCur['cost_part'] + $reportCur['cost_labor'] + $reportCur['cost_purchase'] + $reportCur['cost_fuel'];
+				
 				$report[] = $reportCur;
 
 				$sum['cost_part'] += $reportCur['cost_part'];
@@ -141,7 +143,7 @@ class Truck extends CI_Controller {
 				$sum['cost_fuel'] += $reportCur['cost_fuel'];
 				$sum['total'] += $reportCur['sub_sum'];
 			}
-
+			
 			$search['bdate'] = date('m/d/Y', strtotime($bdate));
 			$search['edate'] = date('m/d/Y', strtotime($edate));
 

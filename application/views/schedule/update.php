@@ -472,6 +472,7 @@
 										<th>Total Bid</th>
 										<th>Used Bid</th>
 										<th>Bid</th>
+										<th>Comment</th>
 										
 									</tr>
 								</thead>
@@ -492,6 +493,7 @@
 										<td  class="text-center" style="vertical-align: middle;"><?php echo $t['cycle'];?></td>
 										<td  class="text-center" style="vertical-align: middle;"><?php echo $t['unitSum'];?></td>
 										<td><input class="form-control" type="text" name="unit_arr_extra[]" value="<?php echo $t['unit'];?>" autocomplete="off"></td>
+										<td><input class="form-control" type="text" name="comment_arr_extra[]" value="<?php echo $t['comment'];?>" autocomplete="off"></td>
 									
 
 									</tr>

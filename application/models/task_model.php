@@ -56,7 +56,7 @@ class Task_model extends CI_Model{
 
 			$this->db->join('(select task_id, sum( case when unit = 0 or unit is null then 0 else unit end ) unitSum from schedule where isdeleted = 0 group by task_id) schedule ', 'schedule.task_id = task.task_id', 'left') ;
 
-			$this->db->join('(select schedule_id, task_id, unit from schedule where schedule_date = "'.$whereExtra['schedule_date'].'" and isdeleted = 0 ) schedule2 ', 'schedule2.task_id = task.task_id', 'left') ;
+			$this->db->join('(select schedule_id, task_id, unit, comment from schedule where schedule_date = "'.$whereExtra['schedule_date'].'" and isdeleted = 0 ) schedule2 ', 'schedule2.task_id = task.task_id', 'left') ;
 		}
 
 
@@ -190,24 +190,29 @@ class Task_model extends CI_Model{
 		        
 		for($row = 2; $row <= $highestRow; $row ++){
 			$curCycle = $objPHPExcel->getActiveSheet()->getCell("G".$row)->getValue();
+			$curTcatid = $objPHPExcel->getActiveSheet()->getCell("K".$row)->getValue();
 			$index[] = $objPHPExcel->getActiveSheet()->getCell("O".$row)->getValue();
-			if(!in_array($curCycle/$year, [1, 2, 3, 4, 6, 12, 24, 52, 54, 104, 108, 156, 162])){
-				$result['count'] = 0;
-	            $result['code'] = 301;//cycle not right
-	            $result['msg'] = "wrong cycle number  (".$curCycle.")";//cycle not right
-	            $result['cycle'] = $curCycle;
-	            //return $result;exit;
-	            //var_dump($result);
+			if($curTcatid < 14){
+				if(!in_array($curCycle/$year, [1, 2, 3, 4, 6, 9, 12, 24, 36, 52, 54, 104, 108, 156, 162])){
+					$result['count'] = 0;
+		            $result['code'] = 301;//cycle not right
+		            $result['msg'] = "wrong cycle number  (".$curCycle.")";//cycle not right
+		            $result['cycle'] = $curCycle;
+		            //return $result;exit;
+		            //var_dump($result);
+				}
+			}else{
+				continue;
 			}
 		}
 
 		$alphabet = range('A', 'Z');
 		$highestColumnNum = array_search($highestColumn, $alphabet);
 
-        //var_dump($highestRow,$highestColumnNum,$year);exit;
+        //var_dump($highestRow,$highestColumnNum,$year,$highestColumn);exit;
 
         //if(is_int($year)){
-        	if($highestColumnNum==$allowed_col_num){//column number is right
+        	if($highestColumnNum + 1 == $allowed_col_num){//column number is right
 	            $result = array();
 
 	            $table = 'task';
@@ -217,13 +222,13 @@ class Task_model extends CI_Model{
 	            $r1 = $query1->result_array();
 	            $r1 = $r1[0]['count'];
 	            
-				$sql_insert = "INSERT INTO ".$table."(contract_id,hwy_id,section_from,section_to,tcat_id,tract,mile,cycle,unit_price,start_index";
+				$sql_insert = "INSERT INTO ".$table."(contract_id,hwy_id,section_from,section_to,tcat_id,tract,mile,cycle,frequency,unit_price,start_index,month_index,crew_index";
 				if($userid) $sql_insert .=",last_update_by";
 				$sql_insert .=")
-					SELECT contract_id,hwy_id,section_from,section_to,tcat_id,tract,mile,cycle,unit_price,start_index";
+					SELECT contract_id,hwy_id,section_from,section_to,tcat_id,tract,mile,cycle,frequency,unit_price,start_index,month_index,crew_index";
 				if($userid) $sql_insert .=",".$userid;
 	            $sql_insert .=" FROM temporary_table
-	                ON DUPLICATE KEY UPDATE contract_id = rtrim(VALUES(contract_id)), hwy_id = VALUES(hwy_id), section_from = VALUES(section_from), section_to = VALUES(section_to), tcat_id = VALUES(tcat_id),tract = VALUES(tract),mile = VALUES(mile),cycle = VALUES(cycle),unit_price = VALUES(unit_price),start_index = VALUE(start_index)";
+	                ";
 				if($userid) $sql_insert .=",last_update_by = ".$userid;
 				$sql_insert .=";";
 				
@@ -243,16 +248,17 @@ class Task_model extends CI_Model{
 	                    
 	                
 	                IGNORE 1 LINES
-	                (@col1, @col2, @col3, @col4, @col5, @col6, @col7, @col8, @col9, @col10, @col11, @col12, @col13, @col14, @col15) 
-					set contract_id=@col12, hwy_id=@col3, section_from=@col4, section_to=@col5, tcat_id=@col11, tract=@col1, mile=@col6, cycle=@col7, unit_price=@col9, start_index=@col15;",
+	                (@col1, @col2, @col3, @col4, @col5, @col6, @col7, @col8, @col9, @col10, @col11, @col12, @col13, @col14, @col15, @col16, @col17) 
+					set contract_id=".$contract_id.", hwy_id=@col3, section_from=@col4, section_to=@col5, tcat_id=@col11, tract=@col1, mile=@col6, cycle=@col7, frequency=@col8, unit_price=@col9, start_index=@col15, month_index=@col16, crew_index=@col17;",
 					
-					$sql_insert            
+					$sql_insert
+
 	            );
 
 
 	            //ENCLOSED BY '\"'
 	            //ESCAPED BY '\"'
-				 
+				/* ON DUPLICATE KEY UPDATE contract_id = rtrim(VALUES(contract_id)), hwy_id = VALUES(hwy_id), section_from = VALUES(section_from), section_to = VALUES(section_to), tcat_id = VALUES(tcat_id),tract = VALUES(tract),mile = VALUES(mile),cycle = VALUES(cycle),unit_price = VALUES(unit_price),start_index = VALUE(start_index),month_index = VALUE(month_index),crew_index = VALUE(crew_index)*/
 
 
 				 //LINES 
@@ -263,7 +269,7 @@ class Task_model extends CI_Model{
 				
 	            foreach($bulksql as $sql2){
 	            	//var_dump($sql2);
-	                //$query2 = $this->db->query($sql2);
+	                $query2 = $this->db->query($sql2);
 	            }
 	            //exit;
 	            $affected_rows = $this->db->affected_rows();
@@ -273,7 +279,7 @@ class Task_model extends CI_Model{
 				
 	            
 
-				//$this->db->query("DROP TABLE temporary_table;");
+				$this->db->query("DROP TABLE temporary_table;");
 				//exit;
 	            $sql3 = "select count(*) count from $table";
 	            $query3 = $this->db->query($sql3);
@@ -296,7 +302,7 @@ class Task_model extends CI_Model{
 				
 				//make the schedule
 				//$arrTaskId = range($start_id, $complete_id);
-				$res_sch = $this->tool_model->loadTaskCSVToSQLSch($contract_id);
+				$res_sch = $this->tool_model->loadTaskCSVToSQLSch2($contract_id);
 
 				if($res_sch['code'] == 200){
 					$result['added_rows'] = $added_rows;
@@ -350,6 +356,7 @@ class Task_model extends CI_Model{
             
             return $result;
         }*/
+        //var_dump($result);exit;
         return $result;
         
         

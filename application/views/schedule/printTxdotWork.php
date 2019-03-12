@@ -14,6 +14,9 @@
 			/*portrait*/
 			width: 900px;
 			height: 1200px;
+
+			/*width: 1200px;
+			height: 1600px;*/
 		}
 
 		.basic {
@@ -64,11 +67,12 @@
 
 		.task th{
 			background-color: #cccccc;
+			font-size: 15px;
 		}
 
 		.task td {
 			margin-left: 2px;
-			/*font-size: 15px;*/
+			font-size: 15px;
 		}
 
 		.lulu {
@@ -118,7 +122,7 @@
 <body>
 	<?php foreach($workReport as $report){?>
 		<div class="report">
-			<h2>PANNELL INDUSTRIES, INC. TXDDOT DAILY WORKING REPORT</h2>
+			<h2>PANNELL INDUSTRIES, INC. TXDOT DAILY WORKING REPORT</h2>
 
 			<div class="basic">
 				<div class="basicLeft">

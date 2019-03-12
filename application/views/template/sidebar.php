@@ -175,8 +175,10 @@
          <li class="dropdown <?php if($current == 'report'){ echo 'active'; }?>">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Report <i class="fas fa-chart-pie fa-lg pull-right hidden-xs" ></i></a>
           <ul class="dropdown-menu forAnimate" role="menu">
+            <li><a href="<?=base_url().'contract/revenue'?>"><i class="fas fa-angle-right"></i> Revenue (TxDot)</a></li>
             <li><a href="<?=base_url().'contract/monthlyBill'?>"><i class="fas fa-angle-right"></i> Monthly Bill (TxDot)</a></li>
             <li><a href="<?=base_url().'contract/dailyReport'?>"><i class="fas fa-angle-right"></i> Daily Report (TxDot)</a></li>
+            <li><a href="<?=base_url().'contract/revenue/?company_type=2'?>"><i class="fas fa-angle-right"></i> Revenue (Commercial)</a></li>
             <li><a href="<?=base_url().'schedule/monthlyBillCom'?>"><i class="fas fa-angle-right"></i> Monthly Bill (Commercial)</a></li>
             <li><a href="<?=base_url().'truck/reportExpense'?>"><i class="fas fa-angle-right"></i> Truck Expenses<br>&nbsp&nbsp(ManagerPlus)</a></li>
           </ul>

@@ -6,10 +6,11 @@ class Tool_model extends CI_Model {
 	{
 		//$this->load->library('cache');
 		$this->load->library('session');
+		$this->load->database();
 		$this->load->model('schedule_model');
 		$this->load->model('task_model');
 		$this->user = $this->session->userdata('user');
-		$this->task_lists_fields = 'SQL_CALC_FOUND_ROWS contract.year, contract.month, contract.bdate, task.contract_id, task.task_id, task.cycle, task.unit_price, task_cat.category';
+		$this->task_lists_fields = 'SQL_CALC_FOUND_ROWS contract.year, contract.month, contract.bdate, task.contract_id, task.task_id, task.cycle, task.unit_price, task_cat.category, task.start_index, task.month_index, task.crew_index';
 	}
 
 	/**
@@ -69,7 +70,7 @@ class Tool_model extends CI_Model {
 	 	echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><script charset="utf-8">'.$al.'window.location.href="'.$url.'";</script>';exit;
 	 }
 
-	/**
+	/**NOT IN USE
 	* Create bulk schedule with schedule_year, schedule_month, schedule_week
 	*
 	* @param	int	$arr_taskid	
@@ -99,7 +100,7 @@ class Tool_model extends CI_Model {
 
 				//var_dump($res->cycle/(52*$res->year), $res->cycle/(54*$res->year), $res->year);
 
-				//frequency based on month or week, 99.999999% is debris, cycles per year inclues: 26, 52, 104, 156,,, 27, 54, 108, 162
+				//frequency based on month or week, if it's week then 99.999999% is debris, cycles per year inclues: 26, 52, 104, 156,,, 27, 54, 108, 162
 				if(is_int($res->cycle/(52*$res->year)) || is_int($res->cycle/(54*$res->year)) || $res->cycle/(52*$res->year) == 0.5 || $res->cycle/(54*$res->year) == 0.5){//by week
 					
 					$ini_dayyyyyyy = date('w', strtotime($res->bdate));
@@ -302,7 +303,7 @@ class Tool_model extends CI_Model {
 								$month_per_cycle = $res->month / $res->cycle ;//month per cycle
 
 								
-								if($res->contract_id == 11 && $res->cycle == 18){//only for harris county
+								if($res->contract_id == 85 && $res->cycle == 18){//only for harris county
 									$work_weekday = $modi_year.'-'.$modi_month.'-01';//1st week
 									//if(date("N", strtotime($work_weekday)) >= $settle_to_next_week_1) $work_weekday = date('Y-m-d', strtotime('+1 week',strtotime($work_weekday)));
 
@@ -430,19 +431,24 @@ class Tool_model extends CI_Model {
 	 }
 
 
-	 /*upload task excel sheet into database, and arrange schedules
-
+	 /*NOT IN USE
+	 upload task excel sheet into database, and arrange schedules
+			
 	 */
 	 function loadTaskCSVToSQLSch($contract_id){
+
+	 	//var_dump($contract_id); exit;
+
 	 	if($contract_id){
 	 		$taskRow = $this->db->query("
-	 			select task.task_id, task.cycle, task.start_index, task.unit_price, tcat.category, ctr.year, ctr.bdate 
+	 			select task.task_id, task.cycle, task.start_index, task.month_index, task.crew_index, task.unit_price, tcat.category, ctr.year, ctr.bdate 
 	 			from task
 	 			left join contract ctr
 	 			on task.contract_id = ctr.contract_id
 	 			left join task_cat tcat
 	 			on tcat.tcat_id = task.tcat_id
 	 			where task.contract_id = $contract_id
+	 			and task.tcat_id < 15
 	 			and task.isdeleted = 0
 	 			and ctr.isdeleted = 0
 	 			order by task.task_id");
@@ -450,139 +456,162 @@ class Tool_model extends CI_Model {
 		 	$contractYear = $task[0]['year'];
 		 	$bdate = $task[0]['bdate'];
 		 	
+		 	
+			//var_dump($task);exit;
 
-		 	$tasktest[0] = $task[0];//test
-		 	$task = $tasktest;//test
-		 	//var_dump($contractYear,$bdate,$task);exit;
+		 	$tasktest = $task;//test
+		 	$task = [];//test
+		 	
+
+		 	$task[0] = $tasktest[4];///////test, comment
+		 	var_dump($contractYear,$bdate,$task);
 
 		 	foreach($task as $tasks){
 
-		 		$startDate = $bdate;//first day of month
+		 		if($tasks['month_index'] && $tasks['start_index'] && $tasks['crew_index'] && $tasks['cycle']){
+
+		 		
+
+			 		$indexMonth = $tasks['month_index'];
+
+			 		$startDate = $indexMonth && $indexMonth != 1 ? date('Y-m-d', strtotime('+ '.($indexMonth - 1).' month', strtotime($bdate))) : $bdate;//first day of index month
 
 
-				if($tasks['category'] == 1 ){
-					$skipDay = [6, 7];
-					$temp_weekday = date('N', strtotime($startDate));
-					$temp_weekday >= 2 || $temp_weekday <= 5 ? $startDate = date('Y-m-d', strtotime('+ '.(7-$temp_weekday).' days', strtotime($startDate))):'';
-				}else{
-					$skipDay = [5, 6];
-				}
-				
-
-				$frequency = $tasks['cycle'] / $contractYear;
-
-
-				$indexDate = $tasks['start_index'] - 1;
-				
-
-				$task_id = $tasks['task_id'];
-
-
-				$unit_price = $tasks['unit_price'];
-
-				//frequency determines addmonth, 24, 104, 108, 156, 162 will be decided later on based on the loop index
-				$startDateAs1st = 'Y-m-1';
-				if(in_array($frequency, [1, 2, 3, 4, 6, 12])){
-					$freAddNum = 12 / $frequency;
-					$freAddUnit = 'month';
-				}elseif($frequency == 24){
-					$freAddNum = 1;
-					$freAddUnit = 'month';
-
-
-				}elseif(in_array($frequency, [52, 54, 104, 108, 156, 162])){
-					$freAddNum = 7;
-					$freAddUnit = 'day';
-					$startDateAs1st = 'Y-m-d';
-
-					
-				}
-
-
-				for($i = 0; $i < $tasks['cycle']; $i ++){
-					
-
-					$indexDate2 = $indexDate;
-					$dareYouTouchMyStartDate = 1;
-					if(in_array($frequency, [104, 108])){
-						switch ($i % 2) {
-							case 0:
-								$dareYouTouchMyStartDate = 0;
-								break;
-							
-							default://1
-								$indexDate2 = $indexDate + 2;
-								break;
-						}
-						
-					}elseif(in_array($frequency, [156, 162])){
-						switch ($i % 3) {
-							case 0:
-								$dareYouTouchMyStartDate = 0;
-								break;
-
-							case 1:
-								$dareYouTouchMyStartDate = 0;
-								$indexDate2 = $indexDate + 2;
-								break;
-
-							default://2
-								$indexDate2 = $indexDate + 4;
-								break;
-						}
-						
-					}elseif($frequency == 24){
-						switch ($i % 2) {
-							case 0:
-								$dareYouTouchMyStartDate = 0;
-								break;
-							
-							default://1
-								$indexDate2 = $indexDate + 14;
-								break;
-						}
-
+					if($tasks['category'] == 1 ){//debris
+						$skipDay = [5, 6];//Friday, Saturday
+						/*$temp_weekday = date('N', strtotime($startDate));
+						$temp_weekday >= 2 || $temp_weekday <= 5 ? $startDate = date('Y-m-d', strtotime('+ '.(7-$temp_weekday).' days', strtotime($startDate))):'';*/
+					}else{//sweeping
+						$skipDay = [5, 6];//Friday, Saturday
 					}
-						//how many friday, saturday and sunday before indexDate in this month
-						$addDate = 0;
-						$count = 0;
-						while (1) {
-							$weekDay = date('N', strtotime('+ '.($addDate + $count).' day', strtotime($startDate)));
-							in_array($weekDay, $skipDay) ? $addDate ++ : $count ++;
-							if($count == $indexDate2 + 1) break;
-						}
 					
+
+					$frequency = $tasks['cycle'] / $contractYear;
+
+
+					$indexDate = $tasks['start_index'] - 1;
+					
+
+					$task_id = $tasks['task_id'];
+
+
+					$unit_price = $tasks['unit_price'];
+
+					$indexCrew = $tasks['crew_index'] ? $tasks['crew_index'] : 1;
+
+					//frequency determines addmonth, 24, 104, 108, 156, 162 will be decided later on based on the loop index
+					$startDateAs1st = $tasks['category'] == 1 ?  'Y-m-d' : 'Y-m-1';
+					if(in_array($frequency, [1, 2, 3, 4, 6, 12])){
+						$freAddNum = 12 / $frequency;
+						$freAddUnit = 'month';
+					}elseif(in_array($frequency, [24])){
+						$freAddNum = 1;
+						$freAddUnit = 'month';
+
+
+					}elseif(in_array($frequency, [52, 54, 104, 108, 156, 162])){
+						$freAddNum = 7;
+						$freAddUnit = 'day';
 
 						
+					}elseif(in_array($frequency, [9])){/////youdianxiaowenti
+						$freAddNum = 6;
+						$freAddUnit = 'week';
+						$startDateAs1st = 'Y-m-d';
+					}
+					//var_dump($freAddUnit,$freAddNum);
 
-					
-					//calculate schedule date
-					$update['taskId'] = $task_id;
-					$update['unitPrice'] = $unit_price;
-					$update['scheduleDate'] = $scheduleDate = date('Y-m-d', strtotime('+ '.($indexDate2 + $addDate).' day', strtotime($startDate)));
+					for($i = 0; $i < $tasks['cycle']; $i ++){
+						
 
-					$update['scheduleYear'] = date('Y', strtotime($scheduleDate));
-					$update['scheduleMonth'] = date('n', strtotime($scheduleDate));
-					$update['scheduleWeek'] = date('W', strtotime($scheduleDate));
+						$indexDate2 = $indexDate;
+						$dareYouTouchMyStartDate = 1;
+						if(in_array($frequency, [104, 108])){
+							switch ($i % 2) {
+								case 0:
+									$dareYouTouchMyStartDate = 0;
+									break;
+								
+								default://1
+									$indexDate2 = $indexDate + 2;
+									break;
+							}
+							
+						}elseif(in_array($frequency, [156, 162])){
+							switch ($i % 3) {
+								case 0:
+									$dareYouTouchMyStartDate = 0;
+									break;
 
-					$arrUpdate .= "(".$update['taskId']."', '".$update['unitPrice']."', '".$update['scheduleYear']."', '".$update['scheduleMonth']."','".$update['scheduleWeek']."','".$update['scheduleDate']."','1'),";//Schedule_id, Year, Month, Week, Date
-					var_dump($update, $dareYouTouchMyStartDate, $freAddNum, $freAddUnit);
+								case 1:
+									$dareYouTouchMyStartDate = 0;
+									$indexDate2 = $indexDate + 2;
+									break;
+
+								default://2
+									$indexDate2 = $indexDate + 4;
+									break;
+							}
+							
+						}elseif($frequency == 24){
+							switch ($i % 2) {
+								case 0:
+									$dareYouTouchMyStartDate = 0;
+									break;
+								
+								default://1
+									$indexDate2 = $indexDate + 10;
+									break;
+							}
+
+						}
+							//how many skip days before indexDate in this month
+							$addDate = 0;
+							$count = 0;
+							while (1) {
+								$weekDay = date('N', strtotime('+ '.($addDate + $count).' day', strtotime($startDate)));
+								in_array($weekDay, $skipDay) ? $addDate ++ : $count ++;
+								if($count == $indexDate2 + 1) break;
+							}
+						
+
+							
+
+						
+						//calculate schedule date
+						$update['taskId'] = $task_id;
+						$update['unitPrice'] = $unit_price;
+						$update['crewId'] = $indexCrew;
+						$update['scheduleDate'] = $scheduleDate = date('Y-m-d', strtotime('+ '.($indexDate2 + $addDate).' day', strtotime($startDate)));
+
+						$update['scheduleYear'] = date('Y', strtotime($scheduleDate));
+						$update['scheduleMonth'] = date('n', strtotime($scheduleDate));
+						$update['scheduleWeek'] = date('W', strtotime('+ 1 day', strtotime($scheduleDate)));//week starts from Sunday
+
+						$arrUpdate .= "(".$update['taskId']."', '".$update['unitPrice']."', '".$update['scheduleYear']."', '".$update['scheduleMonth']."','".$update['scheduleWeek']."','".$update['scheduleDate']."', '".$update['crewId']."'),";//Schedule_id, Year, Month, Week, Date, Crew
+						//var_dump($update, $dareYouTouchMyStartDate, $freAddNum, $freAddUnit);
+						var_dump($update);
 
 
-					//set up next startDate
-					$dareYouTouchMyStartDate == 1 ? $startDate = date($startDateAs1st, strtotime('+ '.$freAddNum.' '.$freAddUnit, strtotime($startDate))) : '';
-					//var_dump($startDate);
+						//set up next startDate
+						$dareYouTouchMyStartDate == 1 ? $startDate = date($startDateAs1st, strtotime('+ '.$freAddNum.' '.$freAddUnit, strtotime($startDate))) : '';
+						var_dump($dareYouTouchMyStartDate,$startDate,$freAddNum,$freAddUnit);
 
-					/*//collin customized
-					$addMonth = in_array($update['scheduleMonth'], [3, 5, 7, 9]) ? 2 : 1;
-					$startDate = date('Y-m-1', strtotime('+ '.$addMonth.' month', strtotime($startDate)));*/
+						/*//collin customized
+						$addMonth = in_array($update['scheduleMonth'], [3, 5, 7, 9]) ? 2 : 1;
+						$startDate = date('Y-m-1', strtotime('+ '.$addMonth.' month', strtotime($startDate)));*/
 
-					unset($update);
+						unset($update);
+					}
+				}else{
+					 continue;
 			 	}
 
 
 			 	$arrUpdate = trim($arrUpdate, ",");
 
+			 	var_dump($arrUpdate);
+				exit;
 				exit;
 
 				$res = $con->query('insert INTO schedule (task_id, unit_price, schedule_year, schedule_month, schedule_week, schedule_date, crew_id)
@@ -594,8 +623,8 @@ class Tool_model extends CI_Model {
 					schedule_year=VALUES(schedule_year), 
 					schedule_month=VALUES(schedule_month),
 					schedule_week=VALUES(schedule_week),
-					schedule_date=VALUES(schedule_date)
-					
+					schedule_date=VALUES(schedule_date),
+					crew_id=VALUES(crew_id)
 					;
 				');
 
@@ -652,7 +681,307 @@ class Tool_model extends CI_Model {
 	 	
 	 }
 
-	 
+	/*IN USE
+	 upload task excel sheet into database, and arrange schedules
+			
+	 */
+	 function loadTaskCSVToSQLSch2($contract_id){
+
+	 	//var_dump($contract_id); exit;
+	 	//current contract and task info
+	 	if($contract_id){
+
+
+	 		$this->skipDayDebris = [6, 7]; //saturday, sunday
+	 		$this->skipDaySweeping = [6, 7]; //saturday, sunday
+	 		$this->skipDayConFre = [9, 52, 54, 104, 108, 156, 162]; //condition on frequency: recurring with weeks
+	 		$this->skipDayConCat = [1]; //or condition on category: debris
+	 		$this->addDateLoopTwiceAWeek = 3; //tuesday and thursday is 2, sunday and wednesday is 3
+	 		$this->debrisFrequencyInMonth = [3, 6, 24, 36]; //debris frequency contains month, each month's index is based on the first weekday
+
+
+
+
+	 		$taskRow = $this->db->query("
+	 			select task.task_id, task.cycle, task.start_index, task.month_index, task.crew_index, task.unit_price, tcat.category, ctr.year, ctr.bdate 
+	 			from task
+	 			left join contract ctr
+	 			on task.contract_id = ctr.contract_id
+	 			left join task_cat tcat
+	 			on tcat.tcat_id = task.tcat_id
+	 			where task.contract_id = $contract_id
+	 			and task.tcat_id < 15
+	 			and task.isdeleted = 0
+	 			and ctr.isdeleted = 0
+	 			order by task.task_id");
+		 	$task = $taskRow->result_array();
+
+		 	//constants for current contract
+		 	$contractYear = $task[0]['year'];
+		 	$bdate = $task[0]['bdate'];
+		 	
+		 	$arrUpdate = '';
+			$update = [];
+
+		 	
+			//var_dump($task);exit;
+		 	//test each task
+		 	/*$tasktest = $task;//test
+		 	$task = [];//test
+		 	$task[0] = $tasktest[0];///////test, comment*/
+		 	
+		 	
+
+		 	foreach($task as $tasks){
+
+		 		if($tasks['month_index'] && $tasks['start_index'] && $tasks['crew_index'] && $tasks['cycle']){
+
+		 			//constants for each task
+		 			$taskId = $tasks['task_id'];
+		 			$unitPrice = $tasks['unit_price'];
+			 		$indexMonth = $tasks['month_index'] - 1;
+			 		$indexDate = $tasks['start_index'] - 1;
+			 		$indexCrew = $tasks['crew_index'];
+			 		$category = $tasks['category'];
+			 		$frequency = $tasks['cycle'] / $contractYear;
+
+			 		$startDate = $indexMonth && $indexMonth != 0 ? date('Y-m-d', strtotime('+ '.($indexMonth).' month', strtotime($bdate))) : $bdate;//first day of index month
+
+			 		if($category == 1 ){//debris
+						$skipDay = $this->skipDayDebris;//Friday, Saturday
+					}else{//sweeping
+						$skipDay = $this->skipDaySweeping;//Friday, Saturday
+					}
+
+
+					//frequency determines addmonth, 1, 2, 3, 4, 6, 9, 12, 24, 36, 52, 54, 104, 108, 156, 162
+					//$startDateAs1st = $tasks['category'] == 1 ?  'Y-m-d' : 'Y-m-1';
+					if(in_array($frequency, [1, 2, 3, 4, 6, 12])){
+
+						$freAddNum = 12 / $frequency;
+						$freAddUnit = 'month';
+
+					}elseif(in_array($frequency, [24, 36])){
+
+						$freAddNum = 1;
+						$freAddUnit = 'month';
+
+					}elseif(in_array($frequency, [52, 54, 104, 108, 156, 162])){
+
+						$freAddNum = 1;
+						$freAddUnit = 'week';
+						
+					}elseif(in_array($frequency, [9])){
+
+						$freAddNum = 6;
+						$freAddUnit = 'week';
+
+						//$startDateAs1st = 'Y-m-d';
+					}else{
+
+						$freAddNum = 1;
+						$freAddUnit = 'month';
+
+					}
+
+					
+
+
+					//cycle starts
+					for($i = 0; $i < $tasks['cycle']; $i ++){
+
+
+
+
+						if((in_array($frequency, $this->skipDayConFre) || in_array($category, $this->skipDayConCat)) && $i != 0 ){
+							$dareYouSkipMyPerfectWorkingDate = 0;
+						}else{
+							$dareYouSkipMyPerfectWorkingDate = 1;
+						}
+
+						//sum of skip dates and index dates
+						if($dareYouSkipMyPerfectWorkingDate == 1){
+							$addSkipDate = 0;
+							$count = 0;
+							$addDateIndexSkip = 0;
+							while (1) {
+								$weekDay = date('N', strtotime('+ '.($addSkipDate + $count).' day', strtotime($startDate)));
+								in_array($weekDay, $skipDay) ? $addSkipDate ++ : $count ++;
+								if($count == $indexDate + 1) break;
+								$addDateIndexSkip = $indexDate + $addSkipDate;
+							}
+						}
+						/*else{
+							$addDateIndexSkip = 0;
+						}*/
+
+
+						
+
+
+
+
+
+						if(in_array($frequency, [104, 108])){
+							switch ($i % 2) {
+								case 0:
+									$addDateLoop = 0;
+									$dareYouTouchMyStartDate = 0;
+									break;
+								
+								default://1
+									$addDateLoop = $this->addDateLoopTwiceAWeek;
+									$dareYouTouchMyStartDate = 1;
+									break;
+							}
+							
+						}elseif(in_array($frequency, [156, 162])){
+							switch ($i % 3) {
+								case 0:
+									$addDateLoop = 0;
+									$dareYouTouchMyStartDate = 0;
+									break;
+
+								case 1:
+									$addDateLoop = 2;
+									$dareYouTouchMyStartDate = 0;
+									break;
+
+								default://2
+									$addDateLoop = 4;
+									$dareYouTouchMyStartDate = 1;
+									break;
+							}
+							
+						}elseif($frequency == 24){
+							switch ($i % 2) {
+								case 0:
+									$addDateLoop = 0;
+									$dareYouTouchMyStartDate = 0;
+									break;
+								
+								default://1
+									$addDateLoop = 14;
+									$dareYouTouchMyStartDate = 1;
+									break;
+							}
+
+						}elseif(in_array($frequency, [36])){
+							switch ($i % 3) {
+								case 0:
+									$addDateLoop = 0;
+									$dareYouTouchMyStartDate = 0;
+									break;
+
+								case 1:
+									$addDateLoop = 7;
+									$dareYouTouchMyStartDate = 0;
+									break;
+								
+								default://1
+									$addDateLoop = 14;
+									$dareYouTouchMyStartDate = 1;
+									break;
+							}
+						}else{
+							$addDateLoop = 0;
+							$dareYouTouchMyStartDate = 1;
+
+						}
+
+
+
+
+
+						//special occasion, debris, frequency contains month
+						if($category == 1 && (in_array($frequency,$this->debrisFrequencyInMonth))){
+							echo 1111111;
+							if($i == 0){
+								$weekDayDebris = date('N', strtotime('+ '.($addDateIndexSkip + $addDateLoop).' day', strtotime($startDate)));
+							}else{
+								if($dareYouTouchMyStartDate == 0){
+
+									
+									$weekDayyyyy = date('N', strtotime($startDate));
+									if($weekDayyyyy <= $weekDayDebris){
+										$addDateIndexSkip = $weekDayDebris - $weekDayyyyy;
+									}else{
+										$addDateIndexSkip = $weekDayDebris + 7 - $weekDayyyyy;
+									}
+									//var_dump('weekDayyyyy: '.$weekDayyyyy, 'weekDayDebris:'.$weekDayDebris);
+									
+								}
+							}
+						}
+
+						
+																		
+
+						//calculate schedule date
+						$update['taskId'] = $taskId;
+						$update['unitPrice'] = $unitPrice;
+						$update['crewId'] = $indexCrew;
+						$update['scheduleDate'] = $scheduleDate = date('Y-m-d', strtotime('+ '.($addDateIndexSkip + $addDateLoop).' day', strtotime($startDate)));
+
+						$update['scheduleYear'] = date('Y', strtotime($scheduleDate));
+						$update['scheduleMonth'] = date('n', strtotime($scheduleDate));
+						$update['scheduleWeek'] = date('W', strtotime('+ 1 day', strtotime($scheduleDate)));//week starts from Sunday
+
+						$arrUpdate .= "('".$update['taskId']."', '".$update['unitPrice']."', '".$update['scheduleYear']."', '".$update['scheduleMonth']."','".$update['scheduleWeek']."','".$update['scheduleDate']."', '".$update['scheduleDate']."', '".$update['crewId']."'),";//Schedule_id, Year, Month, Week, Date, Crew
+						//var_dump($task, $update, '$addDateIndexSkip: '.$addDateIndexSkip, '$addDateLoop: '.$addDateLoop);
+						unset($update);
+
+						//prepare for next round
+						if($dareYouTouchMyStartDate == 1 ){
+							 $startDate = date('Y-m-d', strtotime('+ '.$freAddNum.' '.$freAddUnit, strtotime($startDate)));
+							//$dareYouSkipMyPerfectWorkingDate == 1 ? $addDateIndexSkip = 0 : '';
+						}else{
+							
+						}
+						//var_dump('$dareYouSkipMyPerfectWorkingDate: '.$dareYouSkipMyPerfectWorkingDate, '$dareYouTouchMyStartDate: '.$dareYouTouchMyStartDate, '$startDate: '.$startDate, '$freAddNum: '.$freAddNum, '$freAddUnit: '.$freAddUnit);
+
+					}
+
+
+			 	}else{
+			 		continue;
+			 	}
+			}
+
+			$arrUpdate = trim($arrUpdate, ",");
+
+		 	var_dump($arrUpdate);
+			//exit;
+			//exit;
+
+			$res = $this->db->query('insert INTO schedule (task_id, unit_price, schedule_year, schedule_month, schedule_week, schedule_date, ori_date, crew_id)
+				VALUES 
+				'.$arrUpdate.' 
+				ON DUPLICATE KEY UPDATE
+				task_id=VALUES(task_id), 
+				unit_price=VALUES(unit_price), 
+				schedule_year=VALUES(schedule_year), 
+				schedule_month=VALUES(schedule_month),
+				schedule_week=VALUES(schedule_week),
+				schedule_date=VALUES(schedule_date),
+				ori_date=VALUES(ori_date),
+				crew_id=VALUES(crew_id)
+				;
+			');
+
+			//exit;
+
+			$data['code'] = 200;
+	 		$data['msg'] = 'success';
+	 		return $data;
+
+
+	 	}else{
+	 		$data['code'] = 302;//no contract id
+	 		$data['msg'] = 'no contract id';
+	 		return $data;
+	 	}
+	} 
 
 	function getStartAndEndDate($week, $year) {
 		$dto = new DateTime();

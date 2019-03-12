@@ -97,4 +97,5 @@ defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest auto
 
 defined('BONDING')      OR define('BONDING', 10000000.00); // Bonding amount
 define('PANNELL_IMG_PATH', BASEPATH . '../../assets/img/');
-define('CSV_COLUMN_NUMBER', 14);
+define('CSV_COLUMN_NUMBER', 17);
+define('CONTRACT_ID_DEBRISATNIGHT', [87]); //87:Denton

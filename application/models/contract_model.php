@@ -78,7 +78,7 @@ class Contract_model extends CI_Model{
 
 
 	public function add($data, $type=1) {
-		$filds = $type == 1 ? array('contract_id_pannell','contract_id_ori','company_id','quote_real','office','status','sign_date','bdate','year','addtime') : array('contract_id_pannell', 'poc', 'pon', 'company_id', 'status','travel_hour','cancel_hour','office', 'sign_date');
+		$filds = $type == 1 ? array('contract_id_pannell','contract_id_ori','company_id','quote_real','office','status','sign_date','bdate','year','month','addtime') : array('contract_id_pannell', 'poc', 'pon', 'company_id', 'status','travel_hour','cancel_hour','office', 'sign_date');
 		foreach($filds as $value){
 			if( isset($data[$value])  ){
 				$newarr[$value] = $data[$value];
@@ -142,18 +142,27 @@ class Contract_model extends CI_Model{
 	}
 
 
-	public function revenue_commercial(){
-		$query = 'select ctr.contract_id, ctr.contract_id_pannell, sum(totalTask) sum , sum(totalCurrentTask) sum_current, sum(hourTask) sum_hour
+	public function revenue_commercial($contractStatus = '', $year = 2019, $month = 1){
+		$query = 'select ctr.contract_id, ctr.contract_id_pannell, sum(totalTask) sum , sum(totalCurrentTask) sum_current, sum(totalCurrentYearTask) sum_current_year, sum(hourTask) sum_hour
 from task
 right join
 	(select sc.schedule_id, task.task_id,
 	sum((case when tr.type = 4 then sc.traffic_control_price  else task.unit_price end) * sc.billing_hour) + (case when sc.disposal_price is null then 0 else sc.traffic_control_price end) totalTask, 
     sum((case when tr.type = 4 
 				then 
-					case when year(sc.date) = year(now()) and month(sc.date) = month(now()) then sc.traffic_control_price else 0 end 
+					case when year(sc.schedule_date) = '.$year.' and month(sc.schedule_date) = '.$month.'  then sc.traffic_control_price else 0 end 
 				else 
-					case when year(sc.date) = year(now()) and month(sc.date) = month(now()) then sc.unit_price else 0 end 
+					case when year(sc.schedule_date) = '.$year.' and month(sc.schedule_date) = '.$month.'  then sc.unit_price else 0 end 
 				end) * sc.billing_hour)  + (case when sc.disposal_price is null then 0 else sc.disposal_price end) totalCurrentTask,
+
+	sum((case when tr.type = 4 
+				then 
+					case when year(sc.schedule_date) = '.$year.' then sc.traffic_control_price else 0 end 
+				else 
+					case when year(sc.schedule_date) = '.$year.' then sc.unit_price else 0 end 
+				end) * sc.billing_hour)  + (case when sc.disposal_price is null then 0 else sc.disposal_price end) totalCurrentYearTask,
+
+
 	sum(sc.billing_hour) hourTask
 
 
@@ -178,11 +187,16 @@ right join
     left join company com
     on com.company_id = ctr.company_id
     where com.type = 2
+    ';
+
+		if($contractStatus != ''){$query .= 'and ctr.status = '.$contractStatus;}
+
+		$query .= ' 
     group by task.contract_id
     order by sum desc
 
        ;';
-
+       //echo $query;
 		$res = $this->db->query($query);
 		return $res->result();
 
@@ -289,6 +303,13 @@ order by sum desc;';
 		return array( 'result' => $result , 'total' => $total->row()->count );
 	}
 
+	public function delete($id = ''){
+		if($id){	
+			return  $this->db->update($this->contract_table, ['isdeleted' => 1] , ['contract_id' => $id]);
+		}else{
+			return false;
+		} 
+	}
 
 	public function test(){
 		$query = $this->db->get( $this->contract_table );

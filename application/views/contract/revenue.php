@@ -66,7 +66,7 @@
 				</span> -->
 				<!-- $ <span id="running" class="animateNum" data-animatetarget="<?php echo number_format($sum,1); ?>"><?php echo $sum; ?></span> -->
 				<span style="font-size: 30px; color:red; vertical-align: middle;">$</span> 
-				<div class="odometer" id="odometer" value="<?php echo number_format($sum, 2);?>"><?php echo number_format($sum, 2); ?></div>
+				<div class="odometer" id="odometer" value="<?php echo number_format($sum_cur_year, 2);?>"><?php echo number_format($sum_cur_year, 2); ?></div>
 			<?php } ?>
 		</div>
 	

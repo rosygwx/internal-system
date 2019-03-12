@@ -52,25 +52,7 @@
 
 		
 
-		//add/remove hwy
-		$(function() {
-	        var scntDiv = $('#p_scents');
-	        var i = $('#p_scents p').length + 1;
-	        
-	        $('#addScnt').on('click', function() {
-                $('<p><div class="form-group"><label class="col-md-2 control-label">Highway Name:</label><div class="col-md-10"><input type="text" class="form-control J-presearch-hwy" name="hwy_id[]"  autocomplete="off" required></div></div><div class="form-group"><label class="col-md-2 control-label">Centerline Mileage:</label><div class="col-md-10"><input type="text" class="form-control" name="mileage[]"  autocomplete="off" required></div></div><div class="form-group"><label class="col-md-2 control-label">Section:</label><div class="col-md-10"><input type="text" class="form-control" name="section_from[]" value="" placeholder="From... " /></div><div class="col-md-10"><input type="text" class="form-control" name="section_from[]" value="" placeholder="To... " /></div></div><?php foreach ( $task_cat as $ktc => $vtc ) { ?><div class="form-group"><label class="col-md-2 control-label" style="" >Service - <?php if($ktc==1) echo "Debris"; else echo "Sweeping" ; ?>: </label><div class="col-md-10"><label class="control-label"> Type: </label><?php foreach($vtc as $vvtc) { ?><label class="col-md-offset-1 checkbox-inline" style=""><span><input type="checkbox" name="tcat_id[]" value="<?php echo $vvtc["tcat_id"]; ?>" > 	<?php echo $vvtc["tcat_name"]; ?></span></label><?php } ?></div><div class="col-md-offset-2 col-md-10"><label class="control-label">Cycle:</label><span><input type="text" class="form-control" name="cycle[]"  ></span></div><div class="col-md-offset-2"><label class="col-md-10 " style="float:left;">Frequency:</label><div class="col-md-3"><span><input type="text" class="form-control" name="fre_1[]" onkeyup="value=value.replace(/[^\d\.]/g,"")"  ></span></div><div class="col-md-2"><span style="font-size:18px;">times per</span></div><div class="col-md-3"><span><input type="text" class="form-control" name="fre_2[]" onkeyup="value=value.replace(/[^\d\.]/g,"")" ></span></div><div class="col-md-3"><span><select class="form-control" name="fre_3[]"><option value="1">Week</option><option value="2">Month</option><option value="3">Year</option></select></span></div></div><div class="col-md-offset-2"><label class="col-md-10 " style="float:left;">Unit Price:</label><div class="col-md-10"><span><input type="text" class="form-control" name="unit_price[]" onkeyup="value=value.replace(/[^\d\.]/g,"")"  ></span></div><div class="col-md-1"><span style="font-size:18px;">per</span></div><div class="col-md-10"><span><input type="text" class="form-control" name="unit[]" placeholder="Mile, acre... " ></span></div></div></div><?php } ?></p>').appendTo(scntDiv);
-                i++;
-                return false;
-	        });
-	        
-	        $('#remScnt').on('click', function() { 
-                if( i > 2 ) {
-                        $(this).parents('p').remove();
-                        i--;
-                }
-                return false;
-	        });
-		});
+
 
 		//input new company name or select old company
 		$(document).ready(function(){
@@ -120,7 +102,7 @@
 				<div class="form-group nc1" >
 					<label class="col-md-2 control-label"><i>*</i>County Name:</label>
 					<div class="col-md-10">
-						<input type="text" class="form-control" name="company_name"  autocomplete="new-company_name" required>
+						<input type="text" class="form-control" name="company_name"  autocomplete="new-company_name" >
 					</div>
 				</div>
 
@@ -332,7 +314,7 @@
 
 				<div class="form-group">
 					<div class="col-md-12 text-center" >
-						<input type='submit' class='btn btn-primary btn-submit' value='Submit' onclick='submitValidate()'>
+						<input type='submit' class='btn btn-primary btn-submit' value='Submit' />
 						<input type='button' onclick='history.go(-1)' class='btn btn-primary' value='Cancel'/>
 					</div>
 				</div>

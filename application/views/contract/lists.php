@@ -11,6 +11,11 @@
 	<div class="container" id="main">
 	  <h3>Contract Lists</h3>
 	  <form class="form form-inline" action="" method='get'>
+	  	<div class="form-group">
+			<!-- <label for="title">Company Name:</label> -->
+			<input class="form-control" type='hidden' name='company_type' value='2'>
+		</div> 
+
 	  	<!-- <div class="form-group">
 			<select name='company_type' class="form-control">
 				<option value='1' <?php if($search['company_type'] ==1){echo 'selected';}?>>TxDOT</option>

@@ -95,19 +95,19 @@
 								<?php echo $rep['asset_name']; ?>
 							</td>
 							<td>
-								<?php echo  '$'.$rep['cost_part']; ?>
+								<?php echo  '$'.number_format($rep['cost_part'], 2); ?>
 							</td>
 							<td>
-								<?php echo  '$'.$rep['cost_labor']; ?>
+								<?php echo  '$'.number_format($rep['cost_labor'], 2); ?>
 							</td>
 							<td>
-								<?php echo  '$'.$rep['cost_purchase']; ?>
+								<?php echo  '$'.number_format($rep['cost_purchase'], 2); ?>
 							</td>
 							<td>
-								<?php echo '$'.$rep['cost_fuel']; ?>
+								<?php echo '$'.number_format($rep['cost_fuel'], 2); ?>
 							</td>
 							<td>
-								<?php echo '$'.$rep['sub_sum']; ?>
+								<?php echo '$'.number_format($rep['sub_sum'], 2); ?>
 							</td>
 						</tr>
 						<?php } ?>

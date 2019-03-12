@@ -144,6 +144,7 @@
 										<th class="sorting_asc" style="width:15%">
 											Frequency
 										</th>
+										
 										<?php 
 										for($i = 0; $i < count($week); $i ++ ){?>
 											<th class="sorting_asc" style="width:%; text-align: center;">
@@ -154,6 +155,10 @@
 										<th class="sorting_asc" style="width:8%">
 											Amount
 										</th>
+										<?php if($kbi == 99999){ ?>
+											<th class="sorting_asc" style="">
+											Comment
+										<?php } ?>
 										
 									</tr>
 								</thead>
@@ -195,6 +200,12 @@
 										<td>
 											<?php echo '$'.number_format($vvbi['price'], 2); ?>
 										</td>
+
+										<?php if($kbi == 99999){ ?>
+											<td>
+												<?php echo $vvbi['comment'] ? $vvbi['comment'] : '-'; ?>
+											</td>
+										<?php } ?>
 									</tr>
 									<?php }?>
 									<tr class="gradA odd" role="row">
@@ -205,6 +216,9 @@
 											<?php echo '$'.number_format($sum[$kbi]['price'], 2); ?>
 										</td>
 									</tr>
+
+									
+
 								</tbody>
 							</table>
 							

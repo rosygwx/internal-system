@@ -112,7 +112,8 @@
 			          $('#section_to').val(event.section_to);
 			          $('#btime').val(event.btime);
 			          $('#etime').val(event.etime);
-			          $('#date').val(moment(event.start).format('MM/DD/YYYY'));
+			          $('#date').val(moment(event.schedule_date).format('MM/DD/YYYY'));
+			          $('#complete_date').val(moment(event.complete_date).format('MM/DD/YYYY'));
 			          if(event.status == 1) {
 			          	$('#status').attr("checked", true);
 			          }else{
@@ -264,6 +265,12 @@
 		                <label for="p-in" class="col-md-4 label-heading">Scheduled Date</label>
 		                <div class="col-md-8">
 		                    <input type="text" class="form-control datetimepickerModal" name="date" id="date">
+		                </div>
+		        </div>
+		        <div class="form-group">
+		                <label for="p-in" class="col-md-4 label-heading">Complete Date</label>
+		                <div class="col-md-8">
+		                    <input type="text" class="form-control datetimepickerModal" name="complete_date" id="complete_date">
 		                </div>
 		        </div>
 		        <div class="form-group">

@@ -236,10 +236,12 @@ class Task extends CI_Controller {
 
 	public function test(){
 		//echo 'test';
-		//echo '<pre>';
+		echo '<pre>';
 		//$this->task_model->test();
 
-		$arr_task_id = [446,447,450,464,481];//test
-		$res_add_week = $this->tool_model->add_week($arr_task_id);
+		//$arr_task_id = [446,447,450,464,481];//test
+		//$res_add_week = $this->tool_model->add_week($arr_task_id);
+
+		$res_add_week = $this->tool_model->loadTaskCSVToSQLSch2($contract_id = 97);
 	}
 }
